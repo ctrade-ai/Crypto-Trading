@@ -5,6 +5,10 @@ Logs Prettifier - https://beautifier.io/
 
 String to JSON - https://dadroit.com/string-to-json/
 
+Command to delete log and csv files:-
+1. Macintosh: rm -rf csv-data log-files
+2. Windows: rmdir /s /q csv-data && rmdir /s /q log-files
+
 Logic for changing the price:-
 0.530000 --> 0.530001 || 0.529999
 
