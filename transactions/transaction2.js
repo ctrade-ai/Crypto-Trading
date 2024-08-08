@@ -31,7 +31,10 @@ async function transaction2(
             fetchMarketPrices(),
             fetchBidAskPrices()
         ]),
-        updatedTransactionDetail = updateAllPrices(transactionDetail, { marketPrices, bidAskPrices }),
+        updatedTransactionDetail = updateAllPrices(transactionDetail, {
+            marketPrices: isMarketPrice? marketPrices : undefined,
+            bidAskPrices: !isMarketPrice ? bidAskPrices : undefined
+        }),
         orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX, isMarketPrice);
 
     // Check condition

@@ -97,17 +97,14 @@ Function 2 (Iss mein market price bhi nikalna hai bid/ask ke sath)
 Function 3, 4 (Condition check nahi hogi; Reverse mein bhi nahi hogi)
 
 1. Limit GTC at existing bid/ask price. Wait for 1 second.
-2. Attempts infinite with new bid and ask price of coin three.
+2. Attempts infinite with new bid and ask price of coin three. Wait for 1 second.
     1. Complete/Partial - Next function for executed.
         Remaining quantity --> Same as nothing got filled (sum or all)
     2. Nothing - Wait for 1 second.
 
 FUNCTION R
 
-1. Attempts infinite with new bid and ask price of coin three.
-    1. Complete/Partial - Next function for executed.
-        Remaining quantity --> Same as nothing got filled (sum or all)
-    2. Nothing - Wait for 1 second.
+1. Attempts infinite with new bid and ask price of coin three. Wait for 1 second.
 
 STEP 0
 
