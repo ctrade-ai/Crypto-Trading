@@ -75,8 +75,12 @@ function getOrderInfo(transactionDetail, index, isMarketPrice) {
         price: isMarketPrice
             ? transaction.marketPrice
             : transaction.side === SIDE.BUY
-                ? transaction.askPrice
-                : transaction.bidPrice,
+                ? parseFloat(transaction.askPrice) // ask/bid price and quantity can be zero in illiquid markets
+                    ? transaction.askPrice
+                    : transaction.marketPrice
+                : parseFloat(transaction.bidPrice)
+                    ? transaction.bidPrice
+                    : transaction.marketPrice,
         side: transaction.side,
         qtyPrecision: transaction.qtyPrecision,
         pricePrecision: transaction.pricePrecision,
