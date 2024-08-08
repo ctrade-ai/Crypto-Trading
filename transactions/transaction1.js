@@ -20,8 +20,11 @@ async function transaction1(
 
     logger.info(`${transactionDetail.processId} - Attempts remaining - ${attempts} at function ${FUNCTION_INDEX + 1}`);
 
-    const bidAskPrices = await fetchBidAskPrices(),
-        updatedTransactionDetail = updateAllPrices(transactionDetail, { bidAskPrices }),
+    const [ marketPrices, bidAskPrices ] = await Promise.all([
+            fetchMarketPrices(),
+            fetchBidAskPrices()
+        ]), // marketPrices will be used later
+        updatedTransactionDetail = updateAllPrices(transactionDetail, { marketPrices, bidAskPrices }), // In-case bid/ask is zero
         orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
 
     // Check condition

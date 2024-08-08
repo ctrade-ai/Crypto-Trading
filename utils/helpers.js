@@ -68,26 +68,25 @@ function getOrderInfo(transactionDetail, index, isMarketPrice) {
 
     let price;
 
-        if (isMarketPrice) {
-            price = transaction.marketPrice;
-        } else {
-            if (transaction.side === SIDE.BUY) {
-                if (parseFloat(transaction.askPrice)) { // ask/bid price and quantity can be zero in illiquid markets
-                    price = transaction.askPrice;
-                } else {
-                    logger.info(`${transaction.processId} - Placing limit order at market price because ask price is zero`);
-                    price = transaction.marketPrice;
-                }
+    if (isMarketPrice) {
+        price = transaction.marketPrice;
+    } else {
+        if (transaction.side === SIDE.BUY) {
+            if (parseFloat(transaction.askPrice)) { // ask/bid price and quantity can be zero in illiquid markets
+                price = transaction.askPrice;
             } else {
-                if (parseFloat(transaction.bidPrice)) {
-                    price = transaction.bidPrice;
-                } else {
-                    logger.info(`${transaction.processId} - Placing limit order at market price because bid price is zero`);
-                    price = transaction.marketPrice;
-                }
+                logger.info(`${transaction.processId} - Placing limit order at market price because ask price is zero`);
+                price = transaction.marketPrice;
+            }
+        } else {
+            if (parseFloat(transaction.bidPrice)) {
+                price = transaction.bidPrice;
+            } else {
+                logger.info(`${transaction.processId} - Placing limit order at market price because bid price is zero`);
+                price = transaction.marketPrice;
             }
         }
-
+    }
 
     return {
         symbol: transaction.symbol,
