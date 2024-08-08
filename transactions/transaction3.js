@@ -11,8 +11,6 @@ async function transaction3(
     transactionDetail,
     quantity
 ) {
-    logger.info(`functionX ${quantity}`); // for error debugging
-
     const orderInfo = getOrderInfo(transactionDetail, FUNCTION_INDEX);
 
     try {

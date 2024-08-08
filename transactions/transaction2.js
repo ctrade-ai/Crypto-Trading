@@ -32,7 +32,7 @@ async function transaction2(
             fetchBidAskPrices()
         ]),
         updatedTransactionDetail = updateAllPrices(transactionDetail, { marketPrices, bidAskPrices }),
-        orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX, true); // Place order at market price
+        orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX, isMarketPrice);
 
     // Check condition
     if (transactionDetail.condition1 === 1 && transactionDetail.condition2 === 1) {
@@ -132,6 +132,8 @@ async function cancelOpenOrder(transactionDetail, quantity, attempts, isMarketPr
                     passQty = cancelResponse.cummulativeQuoteQty;
                     repeatQty = cancelResponse.executedQty;
                 }
+
+                // AIBTC
 
                 const remainingAssetQty = (parseFloat(quantity) - parseFloat(repeatQty)).toString();
 
