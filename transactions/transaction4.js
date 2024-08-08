@@ -1,6 +1,6 @@
-const { executeOrder, checkOrderStatus, cancelOrder } = require("../api/trading");
+const { executeOrder, checkOrderStatus, cancelOrder, fetchBidAskPrices } = require("../api/trading");
 const { TYPE, TRANSACTION_STATUS, TIME_IN_FORCE, ORDER_STATUS, SIDE } = require("../config/constants");
-const { endSubProcess, getOrderInfo, updateTransactionDetail, handleSubProcessError } = require("../utils/helpers");
+const { endSubProcess, getOrderInfo, updateTransactionDetail, handleSubProcessError, updateAllPrices } = require("../utils/helpers");
 const logger = require("../utils/logger");
 
 const FUNCTION_INDEX = 3,
