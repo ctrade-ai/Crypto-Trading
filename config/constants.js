@@ -1,9 +1,11 @@
-const SYMBOLS = ["AIUSDT", "BTCUSDT", "AIBTC", "MANAUSDT"], // User-specific
+const SYMBOLS = ["AIUSDT", "AIBTC", "MANABTC", "MANAUSDT"], // User-specific
     INITIAL_QUANTITY = "500",
     TRANSACTION_ATTEMPTS = Object.freeze({ // User-specific
-        TRANSACTION_1: 3,
-        TRANSACTION_2: 3,
-        TRANSACTION_3: 3
+        TRANSACTION_1: 2,
+        TRANSACTION_2: {
+            MARKET: 1,
+            ASK_BUY: 2
+        }
     }),
     SIDE = Object.freeze({
         BUY: "BUY",
@@ -38,11 +40,13 @@ const SYMBOLS = ["AIUSDT", "BTCUSDT", "AIBTC", "MANAUSDT"], // User-specific
     ORDER_STATUS = Object.freeze({
         FILLED: "FILLED",
         EXPIRED: "EXPIRED",
-        PARTIAL: "PARTIAL",
-        NEW: "NEW"
+        PARTIALLY_FILLED: "PARTIALLY_FILLED",
+        NEW: "NEW",
+        CANCELED: "CANCELED"
     }),
     TRANSACTION_DETAIL = Object.freeze({ // User-specific
-        condition: 1, // User-specific
+        condition1: 1, // User-specific
+        condition2: 1, // User-specific
         processId: null, // Frequency ID
         orderStatus: null, // COMPLETED || REVERSED || ERROR
         consumedTime: null,
@@ -52,7 +56,7 @@ const SYMBOLS = ["AIUSDT", "BTCUSDT", "AIBTC", "MANAUSDT"], // User-specific
                 function: "transaction1",
                 symbol: "AIUSDT",
                 side: "BUY",
-                price: null, // Price at which the order is to be placed (Not useful for report only required for coding purposes)
+                marketPrice: null, // Price at which the order is to be placed (Not useful for report only required for coding purposes)
                 bidPrice: null,
                 askPrice: null,
                 cummulativeQuoteQty: null, // Quantity of ticker 2
@@ -61,55 +65,55 @@ const SYMBOLS = ["AIUSDT", "BTCUSDT", "AIBTC", "MANAUSDT"], // User-specific
                 qtyPrecision: 1,
                 pricePrecision: 3,
                 minNotional: 5,
-                minQty: 0.001
+                minQty: 0.1
             },
             {
                 orderId: null,
                 function: "transaction2",
-                symbol: "ETHBTC",
-                side: "BUY",
-                price: null,
+                symbol: "AIBTC",
+                side: "SELL",
+                marketPrice: null,
                 bidPrice: null,
                 askPrice: null,
                 cummulativeQuoteQty: null,
                 executedQty: null,
                 executedPrice: null,
-                qtyPrecision: 4,
-                pricePrecision: 5,
+                qtyPrecision: 1,
+                pricePrecision: 8,
                 minNotional: 0.0001,
-                minQty: 0.0001
+                minQty: 0.1
             },
             {
                 orderId: null,
                 function: "transaction3",
-                symbol: "BNBETH",
+                symbol: "MANABTC",
                 side: "BUY",
-                price: null,
+                marketPrice: null,
                 bidPrice: null,
                 askPrice: null,
                 cummulativeQuoteQty: null,
                 executedQty: null,
                 executedPrice: null,
-                qtyPrecision: 3,
-                pricePrecision: 4,
-                minNotional: 0.001,
-                minQty: 0.001
+                qtyPrecision: 0,
+                pricePrecision: 8,
+                minNotional: 0.0001,
+                minQty: 1
             },
             {
                 orderId: null,
                 function: "transaction4",
-                symbol: "BNBUSDT",
+                symbol: "MANAUSDT",
                 side: "SELL",
-                price: null,
+                marketPrice: null,
                 bidPrice: null,
                 askPrice: null,
                 cummulativeQuoteQty: null,
                 executedQty: null,
                 executedPrice: null,
-                qtyPrecision: 3,
-                pricePrecision: 1,
+                qtyPrecision: 0,
+                pricePrecision: 4,
                 minNotional: 5,
-                minQty: 0.001
+                minQty: 1
             }
         ]
     });

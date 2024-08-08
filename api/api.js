@@ -54,9 +54,11 @@ async function makeApiCall(endpoint, params = {}, method = "GET", authRequired =
                 url: url
             });
         }
+
+        logger.info(`Response from API call to ${endpoint} method - ${method}: ${JSON.stringify(response.data, null, 2)}`);
         return response.data;
     } catch (error) {
-        logger.error(`Error making API call to ${endpoint}`);
+        logger.error(`Error making API call to ${endpoint} method - ${method}: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`);
         throw error;
     }
 }

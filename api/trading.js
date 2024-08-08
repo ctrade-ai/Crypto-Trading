@@ -37,10 +37,23 @@ async function fetchBidAskPrices() {
 async function checkOrderStatus(params) {
     try {
         logger.info(`Request made to check status for symbol - ${params.symbol}, orderId - ${params.orderId}`);
+        const response = await makeApiCall(config.orderPath, params, "GET", true);
 
-        return makeApiCall(config.orderPath, params, "GET", true);
+        return response;
     } catch (error) {
         logger.error(`Error checking status for symbol - ${params.symbol}, orderId - ${params.orderId} with error: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`);
+        throw error;
+    }
+}
+
+async function cancelOrder(params) {
+    try {
+        logger.info(`Request made to cancel for symbol - ${params.symbol}, orderId - ${params.orderId}`);
+        const response = await makeApiCall(config.orderPath, params, "DELETE", true);
+
+        return response;
+    } catch (error) {
+        logger.error(`Error canceling order for symbol - ${params.symbol}, orderId - ${params.orderId} with error: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`);
         throw error;
     }
 }
@@ -48,8 +61,6 @@ async function checkOrderStatus(params) {
 async function executeOrder({
     symbol,
     price,
-    bidPrice,
-    askPrice,
     side,
     type,
     timeInForce,
@@ -63,8 +74,6 @@ async function executeOrder({
         side: side,
         type: type
     };
-
-    price = askPrice; // Remove this line; only used for testing
 
     if (side === SIDE.BUY) {
         // Common for both BUY MARKET and BUY LIMIT
@@ -92,12 +101,16 @@ async function executeOrder({
     if (!parseFloat(quantity) || !(parseFloat(quantity) * parseFloat(price) >= minNotional) || parseFloat(quantity) < minQty) {
         const error = new Error("Quantity too low");
             error.internalCode = ERROR_CODE.INSUFFICIENT_QUANTITY;
-            throw error;
+
+        logger.info(`Min quantity/ Notional issue for price: ${price} and quantity: ${quantity}`);
+        throw error;
     }
 
     try {
         logger.info(`Params for order to be executed: ${JSON.stringify(params, null, 2)}`);
-        return makeApiCall(config.orderPath, params, "POST", true);
+        const response = await makeApiCall(config.orderPath, params, "POST", true);
+
+        return response;
     } catch (error) {
         logger.error(`Error while executing order of params - ${JSON.stringify(params, null, 2)} with error - ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`);
         throw error;
@@ -108,5 +121,6 @@ module.exports = {
     fetchMarketPrices,
     fetchBidAskPrices,
     checkOrderStatus,
-    executeOrder
+    executeOrder,
+    cancelOrder
 }

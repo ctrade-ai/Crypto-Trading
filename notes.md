@@ -14,7 +14,7 @@ Sub-Node 1 --> Original Price pe IOC
 Sub-Node 2 --> Changed Price pe IOC
 Sub-Node 3 --> Market Price
 
-yeh dekhna hai ki saare attempts khatam ho gaye toh dusre sub-node pe kaise jayega
+Yeh dekhna hai ki saare attempts khatam ho gaye toh dusre sub-node pe kaise jayega
 
 
 Explanation for how we are handling quantity vs quoteOrderQty for buy and sell orders:-
@@ -85,10 +85,14 @@ Function 1
 4. Ask price pe karna hai.
 
 
-Function 2
+Function 2 (Iss mein market price bhi nikalna hai bid/ask ke sath)
 
 1. Condition 1 !== 1 --> Reverse at limit bid price. Wait for 1 second. Infinite attempts.
-2. Condition 1 === 1 && Condition 2 === 1 --> Limit GTC at bid/ask. Same as function 1 with 2 attempts. Otherwise reverse.
+2. Condition 1 === 1 && Condition 2 === 1:-
+    i. Limit GTC at Market Price and wait for 1 second (Same as function 1). Jo nahi hua (sum or all) voh next step pe jayega. Jo/jitna ho gya uss 1 second mein (or before) usse function 3 pe bhej deinge.
+    ii. Limit GTC at bid/ask. Same as function 1 with 2 attempts. Otherwise reverse.
+3. Varna reverse kar deinge.
+
 
 Function 3 & 4 (Condition check nahi hogi; Reverse mein bhi nahi hogi)
 
@@ -104,7 +108,7 @@ STEP 0
 ---------------------------------------------------------------------------------------------------------------
 
 
-Agar 90% ho jaata hai toh restart the complete process (500 ya minimum balance lga do)
+Block A - Agar 90% ho jaata hai toh restart the complete process (500 ya minimum balance lga do)
 
 1. 500 --> 440 aa gya --> Process bhi complete ho gya --> Restart the process.
 2. 500 --> 450 jab bhi ho jayega --> Restart the process.
@@ -112,3 +116,14 @@ Agar 90% ho jaata hai toh restart the complete process (500 ya minimum balance l
 
 
 Email bhejna hoga
+
+
+Three Ways to Restart the Process:-
+
+1. Jab eik khatam hoga pura process toh hi agla process start hoga.
+2. Block A.
+3. We will restart the process every second (kuch ho na ho).
+
+
+
+Buy hai toh pehla vala bhejo (executedQty) aur sell hai toh dusra vala bhejo

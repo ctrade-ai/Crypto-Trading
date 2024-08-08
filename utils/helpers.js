@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const logger = require("./logger");
 const generateReport = require("./generateReport");
-const { ERROR_CODE, TRANSACTION_STATUS } = require("../config/constants");
+const { ERROR_CODE, TRANSACTION_STATUS, SIDE } = require("../config/constants");
 
 function getCapital(quantity, price) {
     quantity = parseFloat(quantity);
@@ -49,7 +49,7 @@ function updateAllPrices(transactionDetail, {
             bidAskPrice = bidAskPrices?.find(priceObj => priceObj.symbol === transaction.symbol);
 
         if (marketPrice) {
-            transaction.price = marketPrice.price;
+            transaction.marketPrice = marketPrice.price;
         }
 
         if (bidAskPrice) {
@@ -63,7 +63,7 @@ function updateAllPrices(transactionDetail, {
     return updatedDetail;
 }
 
-function getOrderInfo(transactionDetail, index) {
+function getOrderInfo(transactionDetail, index, isMarketPrice) {
     const transaction = transactionDetail.transactions[index];
 
     if (!transaction) {
@@ -72,9 +72,11 @@ function getOrderInfo(transactionDetail, index) {
 
     return {
         symbol: transaction.symbol,
-        price: transaction.price,
-        bidPrice: transaction.bidPrice,
-        askPrice: transaction.askPrice,
+        price: isMarketPrice
+            ? transaction.marketPrice
+            : transaction.side === SIDE.BUY
+                ? transaction.askPrice
+                : transaction.bidPrice,
         side: transaction.side,
         qtyPrecision: transaction.qtyPrecision,
         pricePrecision: transaction.pricePrecision,
@@ -95,7 +97,7 @@ function updateTransactionDetail(transactionDetail, index, updateValues) {
     updatedDetail.transactions[index].orderId = updateValues.orderId;
     updatedDetail.transactions[index].cummulativeQuoteQty = updateValues.cummulativeQuoteQty;
     updatedDetail.transactions[index].executedQty = updateValues.executedQty;
-    updatedDetail.transactions[index].executedPrice = calculateAveragePrice(updateValues.fills);
+    updatedDetail.transactions[index].executedPrice = updateValues.fills? calculateAveragePrice(updateValues.fills) : updateValues.setPrice;
 
     return updatedDetail;
 }
