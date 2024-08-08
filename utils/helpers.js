@@ -66,21 +66,32 @@ function updateAllPrices(transactionDetail, {
 function getOrderInfo(transactionDetail, index, isMarketPrice) {
     const transaction = transactionDetail.transactions[index];
 
-    if (!transaction) {
-        return null;
-    }
+    let price;
+
+        if (isMarketPrice) {
+            price = transaction.marketPrice;
+        } else {
+            if (transaction.side === SIDE.BUY) {
+                if (parseFloat(transaction.askPrice)) { // ask/bid price and quantity can be zero in illiquid markets
+                    price = transaction.askPrice;
+                } else {
+                    logger.info(`${transaction.processId} - Placing limit order at market price because ask price is zero`);
+                    price = transaction.marketPrice;
+                }
+            } else {
+                if (parseFloat(transaction.bidPrice)) {
+                    price = transaction.bidPrice;
+                } else {
+                    logger.info(`${transaction.processId} - Placing limit order at market price because bid price is zero`);
+                    price = transaction.marketPrice;
+                }
+            }
+        }
+
 
     return {
         symbol: transaction.symbol,
-        price: isMarketPrice
-            ? transaction.marketPrice
-            : transaction.side === SIDE.BUY
-                ? parseFloat(transaction.askPrice) // ask/bid price and quantity can be zero in illiquid markets
-                    ? transaction.askPrice
-                    : transaction.marketPrice
-                : parseFloat(transaction.bidPrice)
-                    ? transaction.bidPrice
-                    : transaction.marketPrice,
+        price: price,
         side: transaction.side,
         qtyPrecision: transaction.qtyPrecision,
         pricePrecision: transaction.pricePrecision,
