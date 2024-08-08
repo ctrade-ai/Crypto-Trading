@@ -9,9 +9,21 @@ const FUNCTION_INDEX = 2,
 
 async function transaction3(
     transactionDetail,
-    quantity
+    quantity,
+    isFirstAttempt = true
 ) {
-    const orderInfo = getOrderInfo(transactionDetail, FUNCTION_INDEX);
+    let orderInfo;
+
+    if (isFirstAttempt) {
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1} first attempt`);
+        orderInfo = getOrderInfo(transactionDetail, FUNCTION_INDEX);
+    } else {
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1} consecutive attempt`);
+        const bidAskPrices = await fetchBidAskPrices(),
+            updatedTransactionDetail = updateAllPrices(transactionDetail, { bidAskPrices });
+
+        orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
+    }
 
     try {
         logger.info(`${transactionDetail.processId} - Placing limit order from function ${FUNCTION_INDEX + 1} at ask/buy price with order info - ${JSON.stringify(orderInfo, null, 2)}`);
@@ -108,11 +120,11 @@ async function cancelOpenOrder(transactionDetail, quantity) {
 
                  // Run both transactions in parallel and return their results
                 return Promise.allSettled([
-                    transaction3(newTransactionDetail, remainingAssetQty).catch(error => handleSubProcessError(error, newTransactionDetail, FUNCTION_INDEX, remainingAssetQty)),
+                    transaction3(newTransactionDetail, remainingAssetQty, false).catch(error => handleSubProcessError(error, newTransactionDetail, FUNCTION_INDEX, remainingAssetQty)),
                     transaction4(newTransactionDetail, passQty).catch(error => handleSubProcessError(error, newTransactionDetail, FUNCTION_INDEX, passQty))
                 ]);
             } else { // Nothing got filled
-                return transaction3(newTransactionDetail, quantity);
+                return transaction3(newTransactionDetail, quantity, false);
             }
         } else {
             logger.info(`${transactionDetail.processId} - Order failed to cancel (based on status) at function ${FUNCTION_INDEX + 1}: No open orders`);

@@ -10,7 +10,9 @@ async function reverseTransaction1(
     transactionDetail,
     quantity
 ) {
-    const orderInfo = getOrderInfo(transactionDetail, FUNCTION_INDEX);
+    const bidAskPrices = await fetchBidAskPrices(),
+        updatedTransactionDetail = updateAllPrices(transactionDetail, { bidAskPrices }),
+        orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
 
     try {
         logger.info(`${transactionDetail.processId} - Placing limit order from function ${FUNCTION_INDEX + 1} at ask/buy price with order info - ${JSON.stringify(orderInfo, null, 2)}`);
