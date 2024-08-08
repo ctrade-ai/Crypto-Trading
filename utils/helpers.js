@@ -75,7 +75,7 @@ function getOrderInfo(transactionDetail, index, isMarketPrice) {
             if (parseFloat(transaction.askPrice)) { // ask/bid price and quantity can be zero in illiquid markets
                 price = transaction.askPrice;
             } else {
-                logger.info(`${transaction.processId} - Placing limit order at market price because ask price is zero`);
+                logger.info(`${transactionDetail.processId} - Placing limit order at market price because ask price is zero`);
                 price = transaction.marketPrice;
             }
         } else {
