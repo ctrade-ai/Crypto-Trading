@@ -12,13 +12,13 @@ async function makeApiCall(endpoint, params = {}, method = "GET", authRequired =
             const timestamp = Date.now(), headers = {};
 
             params.timestamp = timestamp;
+            params.selfTradePreventionMode = "NONE"  // Disable STP
 
             // Generate query string before adding signature
             let queryString = new URLSearchParams(params).toString();
             const signature = generateSignature(queryString, config.apiSecret);
 
             params.signature = signature;
-            params.selfTradePreventionMode = "NONE"  // Disable STP
             headers["X-MBX-APIKEY"] = config.apiKey;
 
             // Recreate query string with signature
