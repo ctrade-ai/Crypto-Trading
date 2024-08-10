@@ -18,6 +18,7 @@ async function makeApiCall(endpoint, params = {}, method = "GET", authRequired =
             const signature = generateSignature(queryString, config.apiSecret);
 
             params.signature = signature;
+            params.selfTradePreventionMode = "NONE"  // Disable STP
             headers["X-MBX-APIKEY"] = config.apiKey;
 
             // Recreate query string with signature
