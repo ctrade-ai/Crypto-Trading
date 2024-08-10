@@ -3,13 +3,18 @@ const { SYMBOLS, SIDE, TYPE, ERROR_CODE } = require("../config/constants");
 const { getCapital, getQtyPrecision } = require("../utils/helpers");
 const logger = require("../utils/logger");
 const makeApiCall = require("./api");
+const { generalRequestLimiter, rawRequestLimiter, dailyOrderLimiter, orderPlacementLimiter } = require("../config/rateLimitConfig");
 
 async function fetchMarketPrices() {
     const symbolsParam = JSON.stringify(SYMBOLS);
 
     try {
         logger.info(`Request made to fetch new market prices of assets - ${JSON.stringify(SYMBOLS, null, 2)}}`);
-        const prices = await makeApiCall(config.marketPricesPath, { symbols: symbolsParam });
+        const prices = await generalRequestLimiter.schedule(() =>
+            rawRequestLimiter.schedule(() =>
+                makeApiCall(config.marketPricesPath, { symbols: symbolsParam })
+            )
+        );
 
         logger.info(`New market prices fetched: ${JSON.stringify(prices, null, 2)}`);
         return prices;
@@ -24,7 +29,11 @@ async function fetchBidAskPrices() {
 
     try {
         logger.info(`Request made to fetch new bid and ask prices of assets - ${JSON.stringify(SYMBOLS, null, 2)}}`);
-        const prices = await makeApiCall(config.bidAskPricesPath, { symbols: symbolsParam });
+        const prices = await generalRequestLimiter.schedule(() =>
+            rawRequestLimiter.schedule(() =>
+                makeApiCall(config.bidAskPricesPath, { symbols: symbolsParam })
+            )
+        );
 
         logger.info(`New bid and ask prices fetched: ${JSON.stringify(prices, null, 2)}`);
         return prices;
@@ -37,7 +46,11 @@ async function fetchBidAskPrices() {
 async function checkOrderStatus(params) {
     try {
         logger.info(`Request made to check status for symbol - ${params.symbol}, orderId - ${params.orderId}`);
-        const response = await makeApiCall(config.orderPath, params, "GET", true);
+        const response = await generalRequestLimiter.schedule(() =>
+            rawRequestLimiter.schedule(() =>
+                makeApiCall(config.orderPath, params, "GET", true)
+            )
+        );
 
         return response;
     } catch (error) {
@@ -49,7 +62,11 @@ async function checkOrderStatus(params) {
 async function cancelOrder(params) {
     try {
         logger.info(`Request made to cancel for symbol - ${params.symbol}, orderId - ${params.orderId}`);
-        const response = await makeApiCall(config.orderPath, params, "DELETE", true);
+        const response = await generalRequestLimiter.schedule(() =>
+            rawRequestLimiter.schedule(() =>
+                makeApiCall(config.orderPath, params, "DELETE", true)
+            )
+        );
 
         return response;
     } catch (error) {
@@ -108,7 +125,13 @@ async function executeOrder({
 
     try {
         logger.info(`Params for order to be executed: ${JSON.stringify(params, null, 2)}`);
-        const response = await makeApiCall(config.orderPath, params, "POST", true);
+        const response = await generalRequestLimiter.schedule(() =>
+            dailyOrderLimiter.schedule(() =>
+                orderPlacementLimiter.schedule(() =>
+                    makeApiCall(config.orderPath, params, "POST", true)
+                )
+            )
+        );
 
         return response;
     } catch (error) {

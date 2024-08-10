@@ -29,10 +29,6 @@ const SYMBOLS = ["AIUSDT", "AIBTC", "MANABTC", "MANAUSDT"], // User-specific
         UNDERVALUED: "UNDERVALUED",
         ERROR: "ERROR"
     }),
-    RATE_LIMIT = Object.freeze({
-        REQUESTS: 50,
-        TIME: 10
-    }),
     UNIDENTIFIED_PROCESS = "UNIDENTIFIED_PROCESS",
     ERROR_CODE = Object.freeze({
         INSUFFICIENT_QUANTITY: "INSUFFICIENT_QUANTITY"
@@ -127,7 +123,6 @@ module.exports = {
     TIME_IN_FORCE,
     SELECTED_PRICE,
     TRANSACTION_STATUS,
-    RATE_LIMIT,
     UNIDENTIFIED_PROCESS,
     ERROR_CODE,
     ORDER_STATUS,
