@@ -49,7 +49,7 @@ async function mainLoop() {
                 logger.error(`${processId} processId cycle failed: ${error}`);
             });
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 5000));
 
         // try {
         //     await transaction1(transactionDetail);

@@ -12,7 +12,10 @@ async function makeApiCall(endpoint, params = {}, method = "GET", authRequired =
             const timestamp = Date.now(), headers = {};
 
             params.timestamp = timestamp;
-            params.selfTradePreventionMode = "NONE"  // Disable STP
+
+            if (method === "POST") {
+                params.selfTradePreventionMode = "NONE"  // Disable STP
+            }
 
             // Generate query string before adding signature
             let queryString = new URLSearchParams(params).toString();
