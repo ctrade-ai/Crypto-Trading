@@ -11,7 +11,7 @@ async function fetchMarketPrices() {
     try {
         logger.info(`Request made to fetch new market prices of assets - ${JSON.stringify(SYMBOLS, null, 2)}}`);
         const prices = await generalRequestLimiter.schedule({ weight: 2 }, () =>
-            rawRequestLimiter.schedule({ weight: 2 },() =>
+            rawRequestLimiter.schedule({ weight: 2 }, () =>
                 makeApiCall(config.marketPricesPath, { symbols: symbolsParam })
             )
         );
@@ -31,7 +31,7 @@ async function fetchBidAskPrices() {
         logger.info(`Request made to fetch new bid and ask prices of assets - ${JSON.stringify(SYMBOLS, null, 2)}}`);
         const prices = await generalRequestLimiter.schedule({ weight: 2 }, () =>
             rawRequestLimiter.schedule({ weight: 2 }, () =>
-                makeApiCall(config.bidAskPricesPath, { symbols: symbolsParam })
+                makeApiCall(config.marketPricesPath, { symbols: symbolsParam })
             )
         );
 
@@ -62,8 +62,8 @@ async function checkOrderStatus(params) {
 async function cancelOrder(params) {
     try {
         logger.info(`Request made to cancel for symbol - ${params.symbol}, orderId - ${params.orderId}`);
-        const response = await generalRequestLimiter.schedule(() =>
-            rawRequestLimiter.schedule(() =>
+        const response = await generalRequestLimiter.schedule({ weight: 1 }, () =>
+            rawRequestLimiter.schedule({ weight: 1 }, () =>
                 makeApiCall(config.orderPath, params, "DELETE", true)
             )
         );
@@ -125,10 +125,12 @@ async function executeOrder({
 
     try {
         logger.info(`Params for order to be executed: ${JSON.stringify(params, null, 2)}`);
-        const response = await generalRequestLimiter.schedule(() =>
-            dailyOrderLimiter.schedule(() =>
-                orderPlacementLimiter.schedule(() =>
-                    makeApiCall(config.orderPath, params, "POST", true)
+        const response = await generalRequestLimiter.schedule({ weight: 1 }, () =>
+            rawRequestLimiter.schedule({ weight: 1 }, () =>
+                dailyOrderLimiter.schedule(() =>
+                    orderPlacementLimiter.schedule(() =>
+                        makeApiCall(config.orderPath, params, "POST", true)
+                    )
                 )
             )
         );
