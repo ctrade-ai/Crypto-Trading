@@ -10,8 +10,8 @@ async function fetchMarketPrices() {
 
     try {
         logger.info(`Request made to fetch new market prices of assets - ${JSON.stringify(SYMBOLS, null, 2)}}`);
-        const prices = await generalRequestLimiter.schedule(() =>
-            rawRequestLimiter.schedule(() =>
+        const prices = await generalRequestLimiter.schedule({ weight: 2 }, () =>
+            rawRequestLimiter.schedule({ weight: 2 },() =>
                 makeApiCall(config.marketPricesPath, { symbols: symbolsParam })
             )
         );
@@ -29,8 +29,8 @@ async function fetchBidAskPrices() {
 
     try {
         logger.info(`Request made to fetch new bid and ask prices of assets - ${JSON.stringify(SYMBOLS, null, 2)}}`);
-        const prices = await generalRequestLimiter.schedule(() =>
-            rawRequestLimiter.schedule(() =>
+        const prices = await generalRequestLimiter.schedule({ weight: 2 }, () =>
+            rawRequestLimiter.schedule({ weight: 2 }, () =>
                 makeApiCall(config.bidAskPricesPath, { symbols: symbolsParam })
             )
         );
@@ -46,8 +46,8 @@ async function fetchBidAskPrices() {
 async function checkOrderStatus(params) {
     try {
         logger.info(`Request made to check status for symbol - ${params.symbol}, orderId - ${params.orderId}`);
-        const response = await generalRequestLimiter.schedule(() =>
-            rawRequestLimiter.schedule(() =>
+        const response = await generalRequestLimiter.schedule({ weight: 2 }, () =>
+            rawRequestLimiter.schedule({ weight: 2 }, () =>
                 makeApiCall(config.orderPath, params, "GET", true)
             )
         );
