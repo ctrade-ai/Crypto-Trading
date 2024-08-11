@@ -9,7 +9,7 @@ const FUNCTION_INDEX = 3,
 async function transaction4(
     transactionDetail,
     quantity,
-    isFirstAttempt
+    isFirstAttempt = true
 ) {
     let orderInfo;
 
