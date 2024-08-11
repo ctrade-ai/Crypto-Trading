@@ -31,7 +31,7 @@ async function fetchBidAskPrices() {
         logger.info(`Request made to fetch new bid and ask prices of assets - ${JSON.stringify(SYMBOLS, null, 2)}}`);
         const prices = await generalRequestLimiter.schedule({ weight: 2 }, () =>
             rawRequestLimiter.schedule({ weight: 2 }, () =>
-                makeApiCall(config.marketPricesPath, { symbols: symbolsParam })
+                makeApiCall(config.bidAskPricesPath, { symbols: symbolsParam })
             )
         );
 

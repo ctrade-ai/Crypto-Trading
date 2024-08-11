@@ -66,7 +66,7 @@ async function mainLoop() {
             // Wait for remaining time
             // await new Promise(resolve => setTimeout(resolve, remainingTime));
 
-            // return;
+            return;
         }
     }
 }
