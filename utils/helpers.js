@@ -69,8 +69,22 @@ function getOrderInfo(transactionDetail, index, isMarketPrice) {
     let price;
 
     if (isMarketPrice) {
-        price = transaction.marketPrice;
-    } else {
+        if (transaction.side === SIDE.BUY) { // Buy
+            if (parseFloat(transaction.marketPrice > transaction.askPrice)) {
+                logger.info(`${transactionDetail.processId} - Placing limit order at ask price because ask price is lesser than market price`);
+                price = transaction.askPrice;
+            } else {
+                price = transaction.marketPrice;
+            }
+        } else { // Sell
+            if (parseFloat(transaction.marketPrice < transaction.bidPrice)) {
+                logger.info(`${transactionDetail.processId} - Placing limit order at bid price because bid price is greater than market price`);
+                price = transaction.bidPrice;
+            } else {
+                price = transaction.marketPrice;
+            }
+        }
+    } else { // Bid/Ask price vala
         if (transaction.side === SIDE.BUY) {
             if (parseFloat(transaction.askPrice)) { // ask/bid price and quantity can be zero in illiquid markets
                 price = transaction.askPrice;
