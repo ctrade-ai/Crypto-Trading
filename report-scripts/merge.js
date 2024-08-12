@@ -2,14 +2,14 @@
 const expectedOrder = ["BTCUSDT", "ETHBTC", "BNBETH", "BNBUSDT"];
 
 // Example API response (unordered)
-const apiResponseMarket = [
-    { symbol: "ETHBTC", price: "0.04360000", askPrice: "0.04370000" },
-    { symbol: "BTCUSDT", price: "58600.00000000", askPrice: "58700.74000000" },
-    { symbol: "BNBETH", price: "0.02440000", askPrice: "0.02450000" },
-    { symbol: "BNBUSDT", bidPrice: "450.00000000", askPrice: "450.50000000" }
+const marketPrices = [
+    { symbol: "ETHBTC", price: "0.04360000" },
+    { symbol: "BTCUSDT", price: "58600.00000000" },
+    { symbol: "BNBETH", price: "0.02440000" },
+    { symbol: "BNBUSDT", bidPrice: "450.00000000" }
 ];
 
-const apiResponseBid = [
+const bidAskPrices = [
     { symbol: "ETHBTC", bidPrice: "0.04360000", askPrice: "0.04370000" },
     { symbol: "BTCUSDT", bidPrice: "58600.00000000", askPrice: "58700.74000000" },
     { symbol: "BNBETH", bidPrice: "0.02440000", askPrice: "0.02450000" },
