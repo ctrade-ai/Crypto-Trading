@@ -6,7 +6,8 @@ const transaction3 = require("./transaction3");
 const reverseTransaction1 = require("./reverseTransaction1");
 
 const FUNCTION_INDEX = 1,
-    ITERATION_TIME = 1000; // Time in ms
+    ITERATION_TIME = 1000, // Time in ms
+    DELAY_STATUS_CHECK = 1000;
 
 async function transaction2(
     transactionDetail,
@@ -67,6 +68,7 @@ async function transaction2(
 
                 return transaction3(newTransactionDetail, passQty);
             } else {
+                await new Promise(resolve => setTimeout(resolve, DELAY_STATUS_CHECK)); // Wait and then check status
                 return checkOrderStatusInLoop(newTransactionDetail, quantity, attempts, isMarketPrice, performance.now()); // Start timer
             }
         } catch(error) {
@@ -188,6 +190,7 @@ async function checkOrderStatusInLoop(transactionDetail, quantity, attempts, isM
 
         if (end - start < ITERATION_TIME) { // Time is remaining
             logger.info(`${transactionDetail.processId} - Re-checking order status at function ${FUNCTION_INDEX + 1}`);
+            await new Promise(resolve => setTimeout(resolve, DELAY_STATUS_CHECK)); // Wait and then check status
             return checkOrderStatusInLoop(newTransactionDetail, quantity, attempts, isMarketPrice, start);
         }
 
