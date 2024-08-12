@@ -1,5 +1,5 @@
 const SYMBOLS = Object.freeze({
-    "AIUSDT": {
+    AIUSDT: {
         qtyPrecision: 1,
         pricePrecision: 3,
         minNotional: 5,
@@ -90,7 +90,7 @@ function createTransactionDetail(condition) {
     return transactionDetail;
 }
 
-console.log(CONDITION_SETS["A"].map(item => item.symbol));
+console.log(Object.keys(SYMBOLS));
 
 // Example usage
 const transactionDetailA = createTransactionDetail("A");

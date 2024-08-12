@@ -12,7 +12,7 @@ price of eth
 */
 
 const INITIAL_QUANTITY = "500",
-    // Eik hi coin pair 2 alag-alag position/function pe ho sakta hai (in case there are 3 coin pairs instead of 4)
+    // Eik hi coin pair 2 alag-alag (kahin buy-kahin sell) position/function pe ho sakta hai (in that case there are 3 coin pairs instead of 4)
     SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is not maintained)
         AIUSDT: {
             qtyPrecision: 1,
@@ -94,7 +94,6 @@ const INITIAL_QUANTITY = "500",
         CANCELED: "CANCELED"
     }),
     TRANSACTION_TEMPLATE = Object.freeze({
-        set: "A", // Default set is A
         processId: null, // Frequency ID
         orderStatus: null, // COMPLETED || REVERSED || ERROR
         consumedTime: null,
