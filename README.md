@@ -1,3 +1,19 @@
+## Steps to Start the Project
+1. To start your application in stage: npm run start
+2. To start your application in prod: npm run start::prod
+3. To stop the stage process: npm run stop
+4. To stop the prod process: npm run stop:prod
+5. To view logs for the stage process: npm run logs
+6. To view logs for the prod process: npm run logs:prod
+3. To delete the stage process: npm run delete
+4. To stop the prod process: npm run delete:prod
+
+## Command to delete log and csv files:-
+1. Macintosh: rm -rf csv-data log-files
+2. Windows: rmdir /s /q csv-data && rmdir /s /q log-files
+
+## Useful Links:-
+
 Merge CSV files online - https://merge-csv.com/
 
 Logs Prettifier - https://beautifier.io/
@@ -5,9 +21,7 @@ Logs Prettifier - https://beautifier.io/
 
 String to JSON - https://dadroit.com/string-to-json/
 
-Command to delete log and csv files:-
-1. Macintosh: rm -rf csv-data log-files
-2. Windows: rmdir /s /q csv-data && rmdir /s /q log-files
+--------------------------------------------------------------------------
 
 Logic for changing the price:-
 0.530000 --> 0.530001 || 0.529999
@@ -80,7 +94,7 @@ Order "status" - FILL, EXPIRED, PARTIAL
 
 For reverse order, we will delete that entry from TRANSACTION_DETAIL array and also the further array values and add a status - "Reversed on market order"
 
-Function 1
+## Function 1
 
 0. Fetch price --> condition === 1 toh code chalega varna retry after 1 second.
 1. Limit GTC, Check status jaldi se jaldi.
@@ -89,7 +103,7 @@ Function 1
 4. Ask price pe karna hai.
 
 
-Function 2 (Iss mein market price bhi nikalna hai bid/ask ke sath)
+## Function 2 (Iss mein market price bhi nikalna hai bid/ask ke sath)
 
 1. Condition 1 !== 1 --> Reverse at limit bid price. Wait for 1 second. Infinite attempts.
 2. Condition 1 === 1 && Condition 2 === 1:-
@@ -98,7 +112,7 @@ Function 2 (Iss mein market price bhi nikalna hai bid/ask ke sath)
 3. Varna reverse kar deinge.
 
 
-Function 3, 4 (Condition check nahi hogi; Reverse mein bhi nahi hogi)
+## Function 3, 4 (Condition check nahi hogi; Reverse mein bhi nahi hogi)
 
 1. Limit GTC at existing bid/ask price. Wait for 1 second.
 2. Attempts infinite with new bid and ask price of coin three. Wait for 1 second.
@@ -106,11 +120,11 @@ Function 3, 4 (Condition check nahi hogi; Reverse mein bhi nahi hogi)
         Remaining quantity --> Same as nothing got filled (sum or all)
     2. Nothing - Wait for 1 second.
 
-FUNCTION R
+## FUNCTION R
 
 1. Attempts infinite with new bid and ask price of coin three. Wait for 1 second.
 
-STEP 0
+## STEP 0
 
 0. Account balance check karna hai.
 1. Jab process start hoga toh function 1 price fetch karega and condtion calculate hogi aur change hogi. Coins beech mein change nahi kareinge yahin set kareinge. Same with buying pattern.
@@ -119,7 +133,7 @@ STEP 0
 ---------------------------------------------------------------------------------------------------------------
 
 
-Block A - Agar 90% ho jaata hai toh restart the complete process (500 ya minimum balance lga do)
+## Block A - Agar 90% ho jaata hai toh restart the complete process (500 ya minimum balance lga do)
 
 1. 500 --> 440 aa gya --> Process bhi complete ho gya --> Restart the process.
 2. 500 --> 450 jab bhi ho jayega --> Restart the process.
@@ -129,12 +143,11 @@ Block A - Agar 90% ho jaata hai toh restart the complete process (500 ya minimum
 Email bhejna hoga
 
 
-Three Ways to Restart the Process:-
+## Three Ways to Restart the Process:-
 
 1. Jab eik khatam hoga pura process toh hi agla process start hoga.
 2. Block A.
 3. We will restart the process every second (kuch ho na ho).
-
 
 
 Buy hai toh pehla vala bhejo (executedQty) aur sell hai toh dusra vala bhejo
