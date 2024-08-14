@@ -40,14 +40,14 @@ async function transaction1(
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Condition are met; Using Set A`);
         builtTransactionDetail = createTransactionDetail(transactionDetail, "A");
 
-        /* Changed initial quantity based on set */
+        /* Changed initial quantity based on set A */
         quantity = quantity?? CONDITION_SETS["A"].inititialQty;
     } else { // Set B
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are not met; Using Set B`);
         builtTransactionDetail = createTransactionDetail(transactionDetail, "B");
 
-         /* Changed initial quantity based on set */
-         quantity = quantity?? CONDITION_SETS["A"].inititialQty;
+         /* Changed initial quantity based on set B */
+         quantity = quantity?? CONDITION_SETS["B"].inititialQty;
     }
 
     logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Created transaction detail - ${JSON.stringify(builtTransactionDetail)}`);
