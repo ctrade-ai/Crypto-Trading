@@ -5,8 +5,8 @@
 4. To stop the prod process: npm run stop:prod
 5. To view logs for the stage process: npm run logs
 6. To view logs for the prod process: npm run logs:prod
-3. To delete the stage process: npm run delete
-4. To stop the prod process: npm run delete:prod
+7. To delete the stage process: npm run delete
+8. To stop the prod process: npm run delete:prod
 
 ## Command to delete log and csv files
 1. Macintosh: rm -rf csv-data log-files
