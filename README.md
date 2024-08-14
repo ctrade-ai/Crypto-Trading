@@ -8,11 +8,11 @@
 3. To delete the stage process: npm run delete
 4. To stop the prod process: npm run delete:prod
 
-## Command to delete log and csv files:-
+## Command to delete log and csv files
 1. Macintosh: rm -rf csv-data log-files
 2. Windows: Remove-Item -Recurse -Force csv-data; Remove-Item -Recurse -Force log-files
 
-## Useful Links:-
+## Useful Links
 
 Merge CSV files online - https://merge-csv.com/
 
@@ -21,7 +21,60 @@ Logs Prettifier - https://beautifier.io/
 
 String to JSON - https://dadroit.com/string-to-json/
 
---------------------------------------------------------------------------
+## Function 1
+
+0. Fetch price --> condition === 1 toh code chalega varna retry after 1 second.
+1. Limit GTC, Check status jaldi se jaldi.
+2. Max 1 second mein pura ho gya toh aage badhao.
+3. 1 second paar ho gya toh cancel the order. Jitna hua hai usko aage bhej do. And bacha hua 1 baar aur try karo price dobara fetch karke and condition check karke.
+4. Ask price pe karna hai.
+
+
+## Function 2 (Iss mein market price bhi nikalna hai bid/ask ke sath)
+
+1. Condition 1 !== 1 --> Reverse at limit bid price. Wait for 1 second. Infinite attempts.
+2. Condition 1 === 1 && Condition 2 === 1:-
+    i. Limit GTC at Market Price and wait for 1 second (Same as function 1). Jo nahi hua (sum or all) voh next step pe jayega. Jo/jitna ho gya uss 1 second mein (or before) usse function 3 pe bhej deinge.
+    ii. Limit GTC at bid/ask. Same as function 1 with 2 attempts. Otherwise reverse.
+3. Varna reverse kar deinge.
+
+
+## Function 3, 4 (Condition check nahi hogi; Reverse mein bhi nahi hogi)
+
+1. Limit GTC at existing bid/ask price. Wait for 1 second.
+2. Attempts infinite with new bid and ask price of coin three. Wait for 1 second.
+    1. Complete/Partial - Next function for executed.
+        Remaining quantity --> Same as nothing got filled (sum or all)
+    2. Nothing - Wait for 1 second.
+
+## FUNCTION R
+
+1. Attempts infinite with new bid and ask price of coin three. Wait for 1 second.
+
+## STEP 0
+
+0. Account balance check karna hai.
+1. Jab process start hoga toh function 1 price fetch karega and condtion calculate hogi aur change hogi. Coins beech mein change nahi kareinge yahin set kareinge. Same with buying pattern.
+2. Condition ka kaam aage sirf reverse karne mein kaam aaeyga.
+
+
+## Block A - Agar 90% ho jaata hai toh restart the complete process (500 ya minimum balance lga do)
+
+1. 500 --> 440 aa gya --> Process bhi complete ho gya --> Restart the process.
+2. 500 --> 450 jab bhi ho jayega --> Restart the process.
+3. 90% amount ho gayi hai toh dobara fir se 10% ke liye nahi chalna hai.
+
+
+Email bhejna hoga
+
+
+## Three Ways to Restart the Process:-
+
+1. Jab eik khatam hoga pura process toh hi agla process start hoga.
+2. Block A.
+3. We will restart the process every second (kuch ho na ho).
+
+## Code Logic for Understanding Purposes
 
 Logic for changing the price:-
 0.530000 --> 0.530001 || 0.529999
@@ -93,62 +146,6 @@ Response returned when an order is placed:-
 Order "status" - FILL, EXPIRED, PARTIAL
 
 For reverse order, we will delete that entry from TRANSACTION_DETAIL array and also the further array values and add a status - "Reversed on market order"
-
-## Function 1
-
-0. Fetch price --> condition === 1 toh code chalega varna retry after 1 second.
-1. Limit GTC, Check status jaldi se jaldi.
-2. Max 1 second mein pura ho gya toh aage badhao.
-3. 1 second paar ho gya toh cancel the order. Jitna hua hai usko aage bhej do. And bacha hua 1 baar aur try karo price dobara fetch karke and condition check karke.
-4. Ask price pe karna hai.
-
-
-## Function 2 (Iss mein market price bhi nikalna hai bid/ask ke sath)
-
-1. Condition 1 !== 1 --> Reverse at limit bid price. Wait for 1 second. Infinite attempts.
-2. Condition 1 === 1 && Condition 2 === 1:-
-    i. Limit GTC at Market Price and wait for 1 second (Same as function 1). Jo nahi hua (sum or all) voh next step pe jayega. Jo/jitna ho gya uss 1 second mein (or before) usse function 3 pe bhej deinge.
-    ii. Limit GTC at bid/ask. Same as function 1 with 2 attempts. Otherwise reverse.
-3. Varna reverse kar deinge.
-
-
-## Function 3, 4 (Condition check nahi hogi; Reverse mein bhi nahi hogi)
-
-1. Limit GTC at existing bid/ask price. Wait for 1 second.
-2. Attempts infinite with new bid and ask price of coin three. Wait for 1 second.
-    1. Complete/Partial - Next function for executed.
-        Remaining quantity --> Same as nothing got filled (sum or all)
-    2. Nothing - Wait for 1 second.
-
-## FUNCTION R
-
-1. Attempts infinite with new bid and ask price of coin three. Wait for 1 second.
-
-## STEP 0
-
-0. Account balance check karna hai.
-1. Jab process start hoga toh function 1 price fetch karega and condtion calculate hogi aur change hogi. Coins beech mein change nahi kareinge yahin set kareinge. Same with buying pattern.
-2. Condition ka kaam aage sirf reverse karne mein kaam aaeyga.
-
----------------------------------------------------------------------------------------------------------------
-
-
-## Block A - Agar 90% ho jaata hai toh restart the complete process (500 ya minimum balance lga do)
-
-1. 500 --> 440 aa gya --> Process bhi complete ho gya --> Restart the process.
-2. 500 --> 450 jab bhi ho jayega --> Restart the process.
-3. 90% amount ho gayi hai toh dobara fir se 10% ke liye nahi chalna hai.
-
-
-Email bhejna hoga
-
-
-## Three Ways to Restart the Process:-
-
-1. Jab eik khatam hoga pura process toh hi agla process start hoga.
-2. Block A.
-3. We will restart the process every second (kuch ho na ho).
-
 
 Buy hai toh pehla vala bhejo (executedQty) aur sell hai toh dusra vala bhejo
 
