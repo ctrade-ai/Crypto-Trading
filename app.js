@@ -1,29 +1,9 @@
 const { v4: uuidv4 } = require("uuid");
 const { performance } = require("perf_hooks");
 
-const { TRANSACTION_TEMPLATE, SIDE } = require("./config/constants");
+const { TRANSACTION_TEMPLATE } = require("./config/constants");
 const transaction1 = require("./transactions/transaction1");
 const logger = require("./utils/logger");
-
-function getTransactionDetail() {
-    const transactionDetail = JSON.parse(JSON.stringify(TRANSACTION_DETAIL));
-
-    transactionDetail["processId"] = uuidv4(); // Unique ID of each tree
-    transactionDetail["consumedTime"] = new Date();
-
-    // Create a copy of the 0th transaction and modify necessary fields for reverse transaction
-    const reverseTransaction = {
-        ...transactionDetail.transactions[0],
-        function: "reverseTransaction1",
-        side: transactionDetail.transactions[0].side === SIDE.BUY? SIDE.SELL : SIDE.BUY
-    };
-
-    // Append the new transaction to the transactions array
-    return {
-        ...transactionDetail,
-        transactions: [...transactionDetail.transactions, reverseTransaction]
-    };
-}
 
 // Infinite loop to keep running indefinitely
 async function mainLoop() {
@@ -47,7 +27,9 @@ async function mainLoop() {
                 timeTaken = ((end - start) / 1000).toFixed(2);
 
             logger.info(`Time taken by ${processId}: ${timeTaken}s`);
-            return;
+
+            /* Uncomment the return statement below to run only a single process */
+            // return;
         }
     }
 }

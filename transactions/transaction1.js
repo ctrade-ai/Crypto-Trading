@@ -1,5 +1,5 @@
 const { executeOrder, fetchBidAskPrices, checkOrderStatus, cancelOrder, fetchMarketPrices } = require("../api/trading");
-const { ORDER_STATUS, TRANSACTION_ATTEMPTS, INITIAL_QUANTITY, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE } = require("../config/constants");
+const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE } = require("../config/constants");
 const { updateAllPrices, getOrderInfo, updateTransactionDetail, handleSubProcessError, mapPriceResponseToOrder, createTransactionDetail } = require("../utils/helpers");
 const logger = require("../utils/logger");
 const transaction2 = require("./transaction2");
