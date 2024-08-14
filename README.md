@@ -65,7 +65,7 @@ String to JSON - https://dadroit.com/string-to-json/
 3. 90% amount ho gayi hai toh dobara fir se 10% ke liye nahi chalna hai.
 
 
-Email bhejna hoga
+*Email bhejna hoga --> Use Nodemailer*
 
 
 ## Three Ways to Restart the Process:-
@@ -74,29 +74,9 @@ Email bhejna hoga
 2. Block A.
 3. We will restart the process every second (kuch ho na ho).
 
-## Code Logic for Understanding Purposes
+## Explanation for executedQty vs cummulativeQuoteQty for buy and sell orders
 
-Logic for changing the price:-
-0.530000 --> 0.530001 || 0.529999
-
-Explanation for sub-nodes in function 3:-
-
-Sub-Node 1 --> Original Price pe IOC
-Sub-Node 2 --> Changed Price pe IOC
-Sub-Node 3 --> Market Price
-
-Yeh dekhna hai ki saare attempts khatam ho gaye toh dusre sub-node pe kaise jayega
-
-
-Explanation for how we are handling quantity vs quoteOrderQty for buy and sell orders:-
-
-usdt/x -> sell - usdt pta hai -> quantity dalegi -> price not required in MO
-usdt/x -> buy - x pta hai -> quantity nikalegi price se -> market order ke liye quoteOrderQty chal jayegi and price nikane ki zaroorat nahi
-
-market buy - no need to calculate fees
-x/usdt -> buy - usdt pta hai -> quantity nikalegi price se -> market order ke liye quoteOrderQty chal jayegi and price nikane ki zaroorat nahi
-x/usdt -> sell - x pta hai -> quantity dalegi -> price not required in MO
-
+**Buy hai toh pehla vala bhejo (executedQty) aur sell hai toh dusra vala bhejo**
 
 ETHUSDT, ETHBTC || QTUMETH
 
@@ -119,7 +99,7 @@ ETHUSDT, ETHBTC || QTUMETH
 ]
 
 
-Step 1 BUY --> quantity nikali padegi
+Step 1 BUY --> quantity nikalni padegi
 10 USDT se 0.1 ETH buy kiya
 quantity = 10 / price
 
@@ -131,33 +111,10 @@ Step 2 Case 2 BUY --> quantity nikalni padegi
 0.1 ETH se 0.05 QTU liya
 quantity = 0.1 / price
 
-
-Details we need to fetch and update in each transaction:-
-
-func getOrderInfo(index --> (transactionDetailfunctionNo - 1))
-For every transaction we need to fetch - symbol, side, price, and precision of that function number
-
-func updateTransactionDetail(index --> (functionNo - 1))
-When that order is successfully placed, we need to update/<return> - cummulativeQuoteQty, executedQty, and executedPrice of that function number
-
-
-Response returned when an order is placed:-
-
-Order "status" - FILL, EXPIRED, PARTIAL
-
-For reverse order, we will delete that entry from TRANSACTION_DETAIL array and also the further array values and add a status - "Reversed on market order"
-
-Buy hai toh pehla vala bhejo (executedQty) aur sell hai toh dusra vala bhejo
-
-/*
+## Formula Format for Conditions
 
 (mp1+mp2+mp3+mp4)/(ap1*bp1+ap2*bp2+ap3*bp1+ap1*bp1)
 
 0-10 --> [AIUSDT|BUY, AI......]
 11-20 --> [BTCUSDT,..]
 21-30 --> [BTCUSDT,...]
-
-price of eth
-[]
-
-*/
