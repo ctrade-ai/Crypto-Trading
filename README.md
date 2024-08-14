@@ -10,7 +10,7 @@
 
 ## Command to delete log and csv files:-
 1. Macintosh: rm -rf csv-data log-files
-2. Windows: rmdir /s /q csv-data && rmdir /s /q log-files
+2. Windows: Remove-Item -Recurse -Force csv-data; Remove-Item -Recurse -Force log-files
 
 ## Useful Links:-
 
