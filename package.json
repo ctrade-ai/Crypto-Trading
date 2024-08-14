@@ -10,7 +10,7 @@
     "restart": "pm2 restart all",
     "delete": "pm2 delete all",
     "logs": "pm2 logs",
-    "staus": "pm2 status",
+    "status": "pm2 status",
     "clean": "rm -rf csv-data log-files"
   },
   "author": "Avi Takiyar",
