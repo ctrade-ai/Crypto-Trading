@@ -1,7 +1,7 @@
 module.exports = {
     apps: [{
       name: "app",
-      script: "./app.js", // Replace with your entry file
+      script: "./app.js",
       env: {
         NODE_ENV: "stage",
         BASE_URL: "https://testnet.binance.vision",
@@ -14,11 +14,14 @@ module.exports = {
       env_prod: {
         NODE_ENV: "prod",
         BASE_URL: "https://api.binance.com",
-        API_KEY: "your-api-key", // Replace with your actual API key
-        API_SECRET: "your-api-secret", // Replace with your actual API secret
+        API_KEY: "", // Replace with your actual API key
+        API_SECRET: "", // Replace with your actual API secret
         MARKET_PRICES_PATH: "/api/v3/ticker/price",
         BID_ASK_PRICES_PATH: "/api/v3/ticker/bookTicker",
         ORDER_PATH: "/api/v3/order"
-      }
+      },
+      autorestart: false,  // Prevents PM2 from restarting the app
+      watch: false,        // Ensure watch mode is off to prevent restarts on file changes
+      max_restarts: 0
     }]
 };

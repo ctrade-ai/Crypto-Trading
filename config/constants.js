@@ -1,6 +1,4 @@
-const INITIAL_QUANTITY = "500",
-    // Eik hi coin pair 2 alag-alag (kahin buy-kahin sell) position/function pe ho sakta hai (in that case there are 3 coin pairs instead of 4)
-    SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is not maintained)
+const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is not maintained)
         AIUSDT: {
             qtyPrecision: 1,
             pricePrecision: 3,
@@ -27,18 +25,24 @@ const INITIAL_QUANTITY = "500",
         }
     }),
     CONDITION_SETS = Object.freeze({
-        "A": [ // This order is to be maintained
-            { symbol: "AIUSDT", side: "BUY" },
-            { symbol: "AIBTC", side: "SELL" },
-            { symbol: "MANABTC", side: "BUY" },
-            { symbol: "MANAUSDT", side: "SELL" }
-        ],
-        "B": [ // Order changed for set B
-            { symbol: "AIUSDT", side: "SELL" },
-            { symbol: "MANAUSDT", side: "BUY" },
-            { symbol: "MANABTC", side: "SELL" },
-            { symbol: "AIBTC", side: "BUY" }
-        ]
+        "A": {
+            inititialQty: 500,
+            trades: [
+                { symbol: "AIUSDT", side: "BUY" },
+                { symbol: "AIBTC", side: "SELL" },
+                { symbol: "MANABTC", side: "BUY" },
+                { symbol: "MANAUSDT", side: "SELL" }
+            ]
+        },
+        "B": {
+            inititialQty: 200,
+            trades: [
+                { symbol: "AIUSDT", side: "SELL" },
+                { symbol: "MANAUSDT", side: "BUY" },
+                { symbol: "MANABTC", side: "SELL" },
+                { symbol: "AIBTC", side: "BUY" }
+            ]
+        }
     }),
     PRICE_TYPE = Object.freeze({
         MARKET_PRICE: "price",
@@ -86,6 +90,7 @@ const INITIAL_QUANTITY = "500",
         CANCELED: "CANCELED"
     }),
     TRANSACTION_TEMPLATE = Object.freeze({
+        set: "A", // Default Set - Do not change
         processId: null, // Frequency ID
         orderStatus: null, // COMPLETED || REVERSED || ERROR
         consumedTime: null,
@@ -139,7 +144,6 @@ const INITIAL_QUANTITY = "500",
     });
 
 module.exports = {
-    INITIAL_QUANTITY,
     SYMBOLS,
     CONDITION_SETS,
     PRICE_TYPE,

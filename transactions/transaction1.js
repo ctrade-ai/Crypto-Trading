@@ -1,6 +1,6 @@
 const { executeOrder, fetchBidAskPrices, checkOrderStatus, cancelOrder, fetchMarketPrices } = require("../api/trading");
-const { ORDER_STATUS, TRANSACTION_ATTEMPTS, INITIAL_QUANTITY, TYPE, TIME_IN_FORCE, SIDE } = require("../config/constants");
-const { updateAllPrices, getOrderInfo, updateTransactionDetail, handleSubProcessError } = require("../utils/helpers");
+const { ORDER_STATUS, TRANSACTION_ATTEMPTS, INITIAL_QUANTITY, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE } = require("../config/constants");
+const { updateAllPrices, getOrderInfo, updateTransactionDetail, handleSubProcessError, mapPriceResponseToOrder, createTransactionDetail } = require("../utils/helpers");
 const logger = require("../utils/logger");
 const transaction2 = require("./transaction2");
 
@@ -9,7 +9,7 @@ const FUNCTION_INDEX = 0,
 
 async function transaction1(
     transactionDetail,
-    quantity = INITIAL_QUANTITY,
+    quantity,
     attempts = TRANSACTION_ATTEMPTS.TRANSACTION_1
 ) {
     if (attempts <= 0) {
@@ -23,18 +23,39 @@ async function transaction1(
     const [ marketPrices, bidAskPrices ] = await Promise.all([
             fetchMarketPrices(),
             fetchBidAskPrices()
-        ]);
+        ]),
+        symbolArray = CONDITION_SETS[transactionDetail.set].trades.map(item => item.symbol),
+        bidArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.BID_PRICE),
+        askArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.ASK_PRICE),
+        marketArray = mapPriceResponseToOrder(symbolArray, marketPrices, PRICE_TYPE.MARKET_PRICE);
 
-    
+    /* User-defined formulas */
+    const formula1 = bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
+        formula2 = bidArray[0] - marketArray[0] / askArray[0] + bidArray[1] * 2 + marketArray[1] - 1 / askArray[1] + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3];
 
-        const updatedTransactionDetail = updateAllPrices(transactionDetail, { marketPrices, bidAskPrices }), // In-case bid/ask is zero
-            orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
+    let builtTransactionDetail;
 
     // Check condition
-    if (transactionDetail.condition1 !== 1) {
-        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Condition1 is not 1`);
-        return;
+    if (formula1 < 50 && 60 < formula2 < 100) { // Set A
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Condition are met; Using Set A`);
+        builtTransactionDetail = createTransactionDetail(transactionDetail, "A");
+
+        /* Changed initial quantity based on set */
+        quantity = quantity?? CONDITION_SETS["A"].inititialQty;
+    } else { // Set B
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are not met; Using Set B`);
+        builtTransactionDetail = createTransactionDetail(transactionDetail, "B");
+
+         /* Changed initial quantity based on set */
+         quantity = quantity?? CONDITION_SETS["A"].inititialQty;
     }
+
+    logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Created transaction detail - ${JSON.stringify(builtTransactionDetail)}`);
+
+    const updatedTransactionDetail = updateAllPrices(builtTransactionDetail, { marketPrices, bidAskPrices }), // In-case bid/ask is zero
+        orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
+
+    logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Price updated transaction detail - ${JSON.stringify(updatedTransactionDetail)}`);
 
     try {
         logger.info(`${transactionDetail.processId} - Placing limit order from function ${FUNCTION_INDEX + 1} at ask/buy price with order info - ${JSON.stringify(orderInfo, null, 2)}`);

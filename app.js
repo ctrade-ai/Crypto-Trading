@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const { performance } = require("perf_hooks");
 
-const { TRANSACTION_DETAIL, SIDE } = require("./config/constants");
+const { TRANSACTION_TEMPLATE, SIDE } = require("./config/constants");
 const transaction1 = require("./transactions/transaction1");
 const logger = require("./utils/logger");
 
@@ -27,7 +27,7 @@ function getTransactionDetail() {
 
 // Infinite loop to keep running indefinitely
 async function mainLoop() {
-    const transactionDetail = JSON.parse(JSON.stringify(TRANSACTION_DETAIL));
+    const transactionDetail = JSON.parse(JSON.stringify(TRANSACTION_TEMPLATE));
 
     while (true) {
         const processId = uuidv4(); // Unique ID of each tree
@@ -47,7 +47,7 @@ async function mainLoop() {
                 timeTaken = ((end - start) / 1000).toFixed(2);
 
             logger.info(`Time taken by ${processId}: ${timeTaken}s`);
-            // return;
+            return;
         }
     }
 }

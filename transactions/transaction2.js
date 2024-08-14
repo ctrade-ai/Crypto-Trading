@@ -1,6 +1,6 @@
 const { executeOrder, fetchBidAskPrices, checkOrderStatus, cancelOrder, fetchMarketPrices } = require("../api/trading");
-const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE } = require("../config/constants");
-const { updateAllPrices, getOrderInfo, updateTransactionDetail, handleSubProcessError } = require("../utils/helpers");
+const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE } = require("../config/constants");
+const { updateAllPrices, getOrderInfo, updateTransactionDetail, handleSubProcessError, mapPriceResponseToOrder } = require("../utils/helpers");
 const logger = require("../utils/logger");
 const transaction3 = require("./transaction3");
 const reverseTransaction1 = require("./reverseTransaction1");
@@ -32,15 +32,28 @@ async function transaction2(
             fetchMarketPrices(),
             fetchBidAskPrices()
         ]),
-        updatedTransactionDetail = updateAllPrices(transactionDetail, {
-            marketPrices: isMarketPrice? marketPrices : undefined,
-            bidAskPrices: !isMarketPrice ? bidAskPrices : undefined
-        }),
-        orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX, isMarketPrice); // Last parameter is used to check whether the trade is to be placed at market or at bid/ask price
+        symbolArray = CONDITION_SETS[transactionDetail.set].trades.map(item => item.symbol),
+        bidArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.BID_PRICE),
+        askArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.ASK_PRICE),
+        marketArray = mapPriceResponseToOrder(symbolArray, marketPrices, PRICE_TYPE.MARKET_PRICE);
+
+    /* User-defined formulas */
+    const formula1 = bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
+        formula2 = bidArray[0] - marketArray[0] / askArray[0] + bidArray[1] * 2 + marketArray[1] - 1 / askArray[1] + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3];
 
     // Check condition
-    if (transactionDetail.condition1 === 1 && transactionDetail.condition2 === 1) {
-        // Code will only run for this condition block
+    if (formula1 < 2000 && 60 < formula2 < 1000) {
+        /* Code will only run for this condition block */
+
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are met; Progressing`);
+
+        const updatedTransactionDetail = updateAllPrices(transactionDetail, {
+                marketPrices: isMarketPrice? marketPrices : undefined,
+                bidAskPrices: !isMarketPrice ? bidAskPrices : undefined
+            }),
+            orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX, isMarketPrice); // Last parameter is used to check whether the trade is to be placed at market or at bid/ask price
+
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Price updated transaction detail - ${JSON.stringify(updatedTransactionDetail)}`);
 
         try {
             logger.info(`${transactionDetail.processId} - Placing limit order from function ${FUNCTION_INDEX + 1} at ${isMarketPrice? "market" : "ask/buy"} price with order info - ${JSON.stringify(orderInfo, null, 2)}`);
@@ -75,7 +88,7 @@ async function transaction2(
             handleSubProcessError(error, transactionDetail, FUNCTION_INDEX, quantity);
         }
     } else {
-        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Condition1 and condition2 are not 1`);
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are not met; Reversing order`);
         return reverseTransaction1(transactionDetail, quantity, true); // Reverse order
     }
 }

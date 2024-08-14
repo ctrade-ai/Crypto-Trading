@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const logger = require("./logger");
 const generateReport = require("./generateReport");
-const { ERROR_CODE, TRANSACTION_STATUS, SIDE } = require("../config/constants");
+const { ERROR_CODE, TRANSACTION_STATUS, SIDE, CONDITION_SETS, SYMBOLS } = require("../config/constants");
 
 function getCapital(quantity, price) {
     quantity = parseFloat(quantity);
@@ -130,16 +130,6 @@ function updateTransactionDetail(transactionDetail, index, updateValues) {
     return updatedDetail;
 }
 
-async function endSubProcess(transactionDetail, index, status, message) {
-    // Create a deep copy of the original object
-    const updatedDetail = JSON.parse(JSON.stringify(transactionDetail));
-
-    updatedDetail["orderStatus"] = status;
-    updatedDetail["consumedTime"] = (((new Date()).getTime() - new Date(updatedDetail.consumedTime).getTime()) / 1000).toFixed(2);
-    logger.info(`${updatedDetail.processId} - Function ${index + 1}: ${message}`);
-    generateReport(updatedDetail);
-}
-
 function changePrice(price, precision) {
     price = parseFloat(price);
 
@@ -148,6 +138,58 @@ function changePrice(price, precision) {
         decreasedPrice = (price - increment).toFixed(precision);
 
     return [increasedPrice.toString(), decreasedPrice.toString()];
+}
+
+function mapPriceResponseToOrder(expectedOrder, apiResponse, priceType) {
+    return expectedOrder.map(symbol => {
+        const matchedPair = apiResponse.find(pair => pair.symbol === symbol);
+
+        return parseFloat(matchedPair[priceType]);
+    });
+}
+
+function createTransactionDetail(transactionDetail, set) {
+    const conditionSet = CONDITION_SETS[set].trades,
+        updatedDetail = JSON.parse(JSON.stringify(transactionDetail));
+
+    transactionDetail["set"] = set;
+    conditionSet.forEach((condition, index) => {
+        const symbolDetails = SYMBOLS[condition.symbol];
+
+        updatedDetail.transactions[index] = {
+            ...transactionDetail.transactions[index],
+            symbol: condition.symbol,
+            side: condition.side,
+            qtyPrecision: symbolDetails.qtyPrecision,
+            pricePrecision: symbolDetails.pricePrecision,
+            minNotional: symbolDetails.minNotional,
+            minQty: symbolDetails.minQty
+        };
+    });
+
+    // Create the reverse function (5th transaction)
+    const firstTransaction = updatedDetail.transactions[0];
+
+    updatedDetail.transactions[4] = {
+        ...transactionDetail.transactions[4],
+        symbol: firstTransaction.symbol,
+        side: firstTransaction.side === "BUY" ? "SELL" : "BUY",
+        qtyPrecision: firstTransaction.qtyPrecision,
+        pricePrecision: firstTransaction.pricePrecision,
+        minNotional: firstTransaction.minNotional,
+        minQty: firstTransaction.minQty
+    };
+    return updatedDetail;
+}
+
+async function endSubProcess(transactionDetail, index, status, message) {
+    // Create a deep copy of the original object
+    const updatedDetail = JSON.parse(JSON.stringify(transactionDetail));
+
+    updatedDetail["orderStatus"] = status;
+    updatedDetail["consumedTime"] = (((new Date()).getTime() - new Date(updatedDetail.consumedTime).getTime()) / 1000).toFixed(2);
+    logger.info(`${updatedDetail.processId} - Function ${index + 1}: ${message}`);
+    generateReport(updatedDetail);
 }
 
 function handleSubProcessError(error, transactionDetail, functionIndex, quantity) {
@@ -169,7 +211,9 @@ module.exports = {
     updateAllPrices,
     getOrderInfo,
     updateTransactionDetail,
-    endSubProcess,
     changePrice,
-    handleSubProcessError
+    createTransactionDetail,
+    mapPriceResponseToOrder,
+    endSubProcess,
+    handleSubProcessError,
 };

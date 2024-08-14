@@ -53,12 +53,14 @@ const TRANSACTION_TEMPLATE = Object.freeze({
     ]
 });
 
-function createTransactionDetail(condition) {
+function createTransactionDetail(set) {
     // Get the condition set based on the provided condition
-    const conditionSet = CONDITION_SETS[condition];
+    const conditionSet = CONDITION_SETS[set];
 
     // Create a deep copy of the transaction template
     const transactionDetail = JSON.parse(JSON.stringify(TRANSACTION_TEMPLATE));
+
+    transactionDetail["set"] = set;
 
     // Fill in the transaction details based on the condition set
     conditionSet.forEach((condition, index) => {

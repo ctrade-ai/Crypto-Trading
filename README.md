@@ -1,16 +1,15 @@
 ## Steps to Start the Project
-1. To start your application in stage: npm run start
-2. To start your application in prod: npm run start::prod
-3. To stop the stage process: npm run stop
-4. To stop the prod process: npm run stop:prod
-5. To view logs for the stage process: npm run logs
-6. To view logs for the prod process: npm run logs:prod
-7. To delete the stage process: npm run delete
-8. To stop the prod process: npm run delete:prod
+1. To start your app in stage - npm run start
+2. To start your app in prod - npm run start:prod
+3. To stop the stage - npm run stop
+4. To view logs - npm run logs
+5. To delete process - npm run delete
+6. To check status of processes - npm run status
+7. To clean log and CSV files on Mac/Linux - npm run clean
 
 ## Command to delete log and csv files
 1. Macintosh: rm -rf csv-data log-files
-2. Windows: Remove-Item -Recurse -Force csv-data; Remove-Item -Recurse -Force log-files
+2. Windows: rd /s /q "csv-data" & rd /s /q "log-files"
 
 ## Useful Links
 
@@ -118,3 +117,5 @@ quantity = 0.1 / price
 0-10 --> [AIUSDT|BUY, AI......]
 11-20 --> [BTCUSDT,..]
 21-30 --> [BTCUSDT,...]
+
+**Eik hi coin pair 2 alag-alag (kahin buy-kahin sell) position/function pe ho sakta hai (in that case there are 3 coin pairs instead of 4)**

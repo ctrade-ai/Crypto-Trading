@@ -22,6 +22,7 @@ async function transaction3(
         const bidAskPrices = await fetchBidAskPrices(),
             updatedTransactionDetail = updateAllPrices(transactionDetail, { bidAskPrices });
 
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Price updated transaction detail - ${JSON.stringify(updatedTransactionDetail)}`);
         orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
     }
 

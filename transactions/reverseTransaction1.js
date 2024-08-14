@@ -14,6 +14,8 @@ async function reverseTransaction1(
         updatedTransactionDetail = updateAllPrices(transactionDetail, { bidAskPrices }),
         orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
 
+    logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Price updated transaction detail - ${JSON.stringify(updatedTransactionDetail)}`);
+
     try {
         logger.info(`${transactionDetail.processId} - Placing limit order from function ${FUNCTION_INDEX + 1} at ask/buy price with order info - ${JSON.stringify(orderInfo, null, 2)}`);
 
