@@ -26,7 +26,7 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is no
     }),
     CONDITION_SETS = Object.freeze({
         "A": {
-            inititialQty: 100,
+            inititialQty: 500,
             trades: [
                 { symbol: "AIUSDT", side: "BUY" },
                 { symbol: "AIBTC", side: "SELL" },
@@ -35,7 +35,7 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is no
             ]
         },
         "B": {
-            inititialQty: 200,
+            inititialQty: 800,
             trades: [
                 { symbol: "AIUSDT", side: "SELL" },
                 { symbol: "MANAUSDT", side: "BUY" },
@@ -44,17 +44,17 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is no
             ]
         }
     }),
-    PRICE_TYPE = Object.freeze({
-        MARKET_PRICE: "price",
-        ASK_PRICE: "askPrice",
-        BID_PRICE: "bidPrice"
-    }),
     TRANSACTION_ATTEMPTS = Object.freeze({ // User-specific
         TRANSACTION_1: 2,
         TRANSACTION_2: {
             MARKET: 1,
             ASK_BUY: 2
         }
+    }),
+    PRICE_TYPE = Object.freeze({
+        MARKET_PRICE: "price",
+        ASK_PRICE: "askPrice",
+        BID_PRICE: "bidPrice"
     }),
     SIDE = Object.freeze({
         BUY: "BUY",
@@ -93,7 +93,7 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is no
     TRANSACTION_TEMPLATE = Object.freeze({
         set: "A", // Default Set - Do not change
         processId: null, // Frequency ID
-        orderStatus: null, // COMPLETED || REVERSED || ERROR
+        orderStatus: null, // COMPLETED || REVERSED || ERROR || REJECTED || UNDERVALUED
         consumedTime: null,
         transactions: [
             { // Function 1
@@ -147,8 +147,8 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is no
 module.exports = {
     SYMBOLS,
     CONDITION_SETS,
-    PRICE_TYPE,
     TRANSACTION_ATTEMPTS,
+    PRICE_TYPE,
     SIDE,
     TYPE,
     TIME_IN_FORCE,
