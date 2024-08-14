@@ -36,7 +36,7 @@ async function transaction2(
             marketPrices: isMarketPrice? marketPrices : undefined,
             bidAskPrices: !isMarketPrice ? bidAskPrices : undefined
         }),
-        orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX, isMarketPrice);
+        orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX, isMarketPrice); // Last parameter is used to check whether the trade is to be placed at market or at bid/ask price
 
     // Check condition
     if (transactionDetail.condition1 === 1 && transactionDetail.condition2 === 1) {

@@ -27,7 +27,7 @@ function getTransactionDetail() {
 
 // Infinite loop to keep running indefinitely
 async function mainLoop() {
-    const transactionDetail = getTransactionDetail();
+    const transactionDetail = JSON.parse(JSON.stringify(TRANSACTION_DETAIL));
 
     while (true) {
         const processId = uuidv4(); // Unique ID of each tree
