@@ -1,6 +1,6 @@
 const { executeOrder, fetchBidAskPrices, checkOrderStatus, cancelOrder, fetchMarketPrices } = require("../api/trading");
-const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE } = require("../config/constants");
-const { updateAllPrices, getOrderInfo, updateTransactionDetail, handleSubProcessError, mapPriceResponseToOrder, createTransactionDetail } = require("../utils/helpers");
+const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE, TRANSACTION_STATUS } = require("../config/constants");
+const { updateAllPrices, getOrderInfo, updateTransactionDetail, handleSubProcessError, mapPriceResponseToOrder, createTransactionDetail, endSubProcess } = require("../utils/helpers");
 const logger = require("../utils/logger");
 const transaction2 = require("./transaction2");
 
@@ -14,8 +14,8 @@ async function transaction1(
 ) {
     if (attempts <= 0) {
         // Leave aside the remaining quantity
-        logger.info(`${transactionDetail.processId} - Remaining quantity ${quantity} at function ${FUNCTION_INDEX + 1}: Partial`);
-        return;
+        logger.info(`${transactionDetail.processId} - Remaining quantity ${quantity} at function ${FUNCTION_INDEX + 1}: Partial completion - Terminating with remaining quantity`);
+        return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REJECTED, `Sub-process rejected: Order did not get executed in any attempt; Terminating branch`);
     }
 
     logger.info(`${transactionDetail.processId} - Attempts remaining - ${attempts} at function ${FUNCTION_INDEX + 1}`);

@@ -76,7 +76,8 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is no
         COMPLETED: "COMPLETED",
         REVERSED: "REVERSED",
         UNDERVALUED: "UNDERVALUED",
-        ERROR: "ERROR"
+        ERROR: "ERROR",
+        REJECTED: "REJECTED"
     }),
     UNIDENTIFIED_PROCESS = "UNIDENTIFIED_PROCESS",
     ERROR_CODE = Object.freeze({
