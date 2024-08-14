@@ -1,3 +1,5 @@
+/* Code Snippet for changing waiting time */
+
 transaction1(transactionDetail)
     .then(() => {
         const end = performance.now(), // End timer
