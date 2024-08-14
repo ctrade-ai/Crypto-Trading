@@ -37,8 +37,6 @@ async function mainLoop() {
 
         const start = performance.now(); // Start timer
 
-        
-
         try {
             await transaction1(transactionDetail);
             logger.info(`${processId} processId cycle complete`);
