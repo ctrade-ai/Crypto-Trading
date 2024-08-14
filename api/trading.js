@@ -125,7 +125,9 @@ async function executeOrder({
 
     try {
         logger.info(`Params for order to be executed: ${JSON.stringify(params, null, 2)}`);
-        logger.info(`ABRACADABRA`); // To keep a log of the no. of limit order requests made
+
+        /* To keep a log of the no. of limit order requests made */
+        logger.info(`ABRACADABRA`);
 
         const response = await generalRequestLimiter.schedule({ weight: 1 }, () =>
             rawRequestLimiter.schedule({ weight: 1 }, () =>
