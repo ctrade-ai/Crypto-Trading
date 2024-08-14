@@ -7,7 +7,7 @@ const reverseTransaction1 = require("./reverseTransaction1");
 
 const FUNCTION_INDEX = 1,
     ITERATION_TIME = 1000, // Time in ms
-    DELAY_STATUS_CHECK = 1000;
+    DELAY_STATUS_CHECK = 0;
 
 async function transaction2(
     transactionDetail,

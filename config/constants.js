@@ -26,7 +26,7 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is no
     }),
     CONDITION_SETS = Object.freeze({
         "A": {
-            inititialQty: 500,
+            inititialQty: 100,
             trades: [
                 { symbol: "AIUSDT", side: "BUY" },
                 { symbol: "AIBTC", side: "SELL" },
