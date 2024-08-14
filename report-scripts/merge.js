@@ -20,25 +20,34 @@ const bidAskPrices = [
 function mapResponseToOrder(expectedOrder, apiResponse, priceType) {
     return expectedOrder.map(symbol => {
         const matchedPair = apiResponse.find(pair => pair.symbol === symbol);
-        return parseFloat(matchedPair[priceType]);
+
+        return matchedPair[priceType];
     });
 }
 
 // Map the API response to the expected order for bid and ask prices
-const bidPrices = mapResponseToOrder(expectedOrder, apiResponse, 'bidPrice');
-const askPrices = mapResponseToOrder(expectedOrder, apiResponse, 'askPrice');
+const bidPrice = mapResponseToOrder(expectedOrder, bidAskPrices, "bidPrice");
+const askPrice = mapResponseToOrder(expectedOrder, bidAskPrices, "askPrice");
+const marketPrice = mapResponseToOrder(expectedOrder, marketPrices, "price");
 
-// Example formula using array indices
-const formula = "bid[0] + ask[1] * bid[2] - ask[3]";
+console.log({
+    marketPrice,
+    bidPrice,
+    askPrice
+});
 
-// Evaluate the formula using the bidPrices and askPrices arrays
-function evaluateFormula(bid, ask, formula) {
-    const processedFormula = formula
-        .replace(/bid\[(\d+)\]/g, (_, index) => bid[index])
-        .replace(/ask\[(\d+)\]/g, (_, index) => ask[index]);
-    return eval(processedFormula);
-}
 
-// Calculate the result
-const result = evaluateFormula(bidPrices, askPrices, formula);
-console.log("Result:", result);
+// // Example formula using array indices
+// const formula = "bid[0] + ask[1] * bid[2] - ask[3]";
+
+// // Evaluate the formula using the bidPrices and askPrices arrays
+// function evaluateFormula(bid, ask, formula) {
+//     const processedFormula = formula
+//         .replace(/bid\[(\d+)\]/g, (_, index) => bid[index])
+//         .replace(/ask\[(\d+)\]/g, (_, index) => ask[index]);
+//     return eval(processedFormula);
+// }
+
+// // Calculate the result
+// const result = evaluateFormula(bidPrices, askPrices, formula);
+// console.log("Result:", result);

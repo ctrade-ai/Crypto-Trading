@@ -151,3 +151,16 @@ Email bhejna hoga
 
 
 Buy hai toh pehla vala bhejo (executedQty) aur sell hai toh dusra vala bhejo
+
+/*
+
+(mp1+mp2+mp3+mp4)/(ap1*bp1+ap2*bp2+ap3*bp1+ap1*bp1)
+
+0-10 --> [AIUSDT|BUY, AI......]
+11-20 --> [BTCUSDT,..]
+21-30 --> [BTCUSDT,...]
+
+price of eth
+[]
+
+*/

@@ -23,9 +23,12 @@ async function transaction1(
     const [ marketPrices, bidAskPrices ] = await Promise.all([
             fetchMarketPrices(),
             fetchBidAskPrices()
-        ]), // marketPrices will be used later
-        updatedTransactionDetail = updateAllPrices(transactionDetail, { marketPrices, bidAskPrices }), // In-case bid/ask is zero
-        orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
+        ]);
+
+    
+
+        const updatedTransactionDetail = updateAllPrices(transactionDetail, { marketPrices, bidAskPrices }), // In-case bid/ask is zero
+            orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
 
     // Check condition
     if (transactionDetail.condition1 !== 1) {

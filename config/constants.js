@@ -1,16 +1,3 @@
-/*
-
-(mp1+mp2+mp3+mp4)/(ap1*bp1+ap2*bp2+ap3*bp1+ap1*bp1)
-
-0-10 --> [AIUSDT|BUY, AI......]
-11-20 --> [BTCUSDT,..]
-21-30 --> [BTCUSDT,...]
-
-price of eth
-[]
-
-*/
-
 const INITIAL_QUANTITY = "500",
     // Eik hi coin pair 2 alag-alag (kahin buy-kahin sell) position/function pe ho sakta hai (in that case there are 3 coin pairs instead of 4)
     SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is not maintained)
@@ -52,6 +39,11 @@ const INITIAL_QUANTITY = "500",
             { symbol: "MANABTC", side: "SELL" },
             { symbol: "AIBTC", side: "BUY" }
         ]
+    }),
+    PRICE_TYPE = Object.freeze({
+        MARKET_PRICE: "price",
+        ASK_PRICE: "askPrice",
+        BID_PRICE: "bidPrice"
     }),
     TRANSACTION_ATTEMPTS = Object.freeze({ // User-specific
         TRANSACTION_1: 2,
@@ -150,6 +142,7 @@ module.exports = {
     INITIAL_QUANTITY,
     SYMBOLS,
     CONDITION_SETS,
+    PRICE_TYPE,
     TRANSACTION_ATTEMPTS,
     SIDE,
     TYPE,
