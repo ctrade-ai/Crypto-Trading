@@ -37,19 +37,7 @@ async function mainLoop() {
 
         const start = performance.now(); // Start timer
 
-        // transaction1(transactionDetail)
-        //     .then(() => {
-        //         const end = performance.now(), // End timer
-        //             timeTaken = ((end - start) / 1000).toFixed(2);
-
-        //         logger.info(`${processId} processId cycle complete`);
-        //         logger.info(`Time taken by ${processId}: ${timeTaken}s`);
-        //     })
-        //     .catch((error) => {
-        //         logger.error(`${processId} processId cycle failed: ${error}`);
-        //     });
-
-        // await new Promise(resolve => setTimeout(resolve, 1000));
+        
 
         try {
             await transaction1(transactionDetail);
@@ -58,15 +46,10 @@ async function mainLoop() {
             logger.error(`${processId} processId cycle failed: ${error}`);
         } finally {
             const end = performance.now(), // End timer
-                timeTaken = ((end - start) / 1000).toFixed(2); // Calculate time taken in seconds with one decimal place
-                // remainingTime = timeTaken % 1 === 0 ? 0 : (1 - (timeTaken % 1)).toFixed(1) * 1000; // Calculate the remaining time to the next second
+                timeTaken = ((end - start) / 1000).toFixed(2);
 
             logger.info(`Time taken by ${processId}: ${timeTaken}s`);
-
-            // Wait for remaining time
-            // await new Promise(resolve => setTimeout(resolve, remainingTime));
-
-            return;
+            // return;
         }
     }
 }

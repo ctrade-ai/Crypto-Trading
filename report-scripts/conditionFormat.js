@@ -92,6 +92,16 @@ function createTransactionDetail(condition) {
 
 console.log(Object.keys(SYMBOLS));
 
+// Extract symbols for Condition Set A
+const symbolsA = CONDITION_SETS.A.map(item => item.symbol);
+
+// Extract symbols for Condition Set B
+const symbolsB = CONDITION_SETS.B.map(item => item.symbol);
+
+console.log("Symbols for Condition Set A:", symbolsA);
+console.log("Symbols for Condition Set B:", symbolsB);
+
+
 // Example usage
 const transactionDetailA = createTransactionDetail("A");
 const transactionDetailB = createTransactionDetail("B");
