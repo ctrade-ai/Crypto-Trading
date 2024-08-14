@@ -126,7 +126,7 @@ async function executeOrder({
         logger.info(`Params for order to be executed: ${JSON.stringify(params, null, 2)}`);
 
         /* To keep a log of the no. of order requests made */
-        logger.info(`ABRACADABRA - Order request API hit`);
+        logger.info(`ABRACADABRA - New order API hit (POST)`);
 
         const response = await generalRequestLimiter.schedule({ weight: 1 }, () =>
             rawRequestLimiter.schedule({ weight: 1 }, () =>
