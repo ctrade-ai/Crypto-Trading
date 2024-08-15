@@ -15,7 +15,7 @@ async function transaction3(
     let orderInfo;
 
     if (isFirstAttempt) {
-        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1} first attempt`);
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1} first attempt`); // Bid/ask price
         orderInfo = getOrderInfo(transactionDetail, FUNCTION_INDEX);
     } else {
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1} consecutive attempt`);

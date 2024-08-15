@@ -54,7 +54,7 @@ async function transaction1(
 
     logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Created transaction detail - ${JSON.stringify(builtTransactionDetail)}`);
 
-    const updatedTransactionDetail = updateAllPrices(builtTransactionDetail, { marketPrices, bidAskPrices }), // In-case bid/ask is zero
+    const updatedTransactionDetail = updateAllPrices(builtTransactionDetail, { marketPrices, bidAskPrices }), // Use market price in-case bid/ask is zero. Also, the previous market price of pair 2 is used in function 2
         orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
 
     logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Price updated transaction detail - ${JSON.stringify(updatedTransactionDetail)}`);
