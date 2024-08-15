@@ -15,7 +15,7 @@ async function transaction1(
     if (attempts <= 0) {
         // Leave aside the remaining quantity
         logger.info(`${transactionDetail.processId} - Remaining quantity ${quantity} at function ${FUNCTION_INDEX + 1}: Partial completion - Terminating with remaining quantity`);
-        return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REJECTED, `Sub-process rejected: Order did not get executed in any attempt; Terminating branch`);
+        return endSubProcess(transactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REJECTED, `Sub-process rejected: Order did not get executed in any attempt; Terminating branch`);
     }
 
     logger.info(`${transactionDetail.processId} - Attempts remaining - ${attempts} at function ${FUNCTION_INDEX + 1}`);
@@ -49,7 +49,7 @@ async function transaction1(
          quantity = quantity?? CONDITION_SETS["B"].inititialQty;
     } else {
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are not met`);
-        return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REJECTED, `Sub-process rejected: Order did not get executed as conditions were not met; Terminating branch`);
+        return endSubProcess(transactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REJECTED, `Sub-process rejected: Order did not get executed as conditions were not met; Terminating branch`);
     }
 
     logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Created transaction detail - ${JSON.stringify(builtTransactionDetail)}`);
