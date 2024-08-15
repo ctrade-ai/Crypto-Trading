@@ -47,7 +47,7 @@ async function transaction2(
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are met; Progressing`);
 
         const updatedTransactionDetail = updateAllPrices(transactionDetail, {
-                marketPrices: isMarketPrice? marketPrices : undefined,
+                // marketPrices: isMarketPrice? marketPrices : undefined,
                 bidAskPrices: !isMarketPrice ? bidAskPrices : undefined
             }),
             orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX, isMarketPrice); // Last parameter is used to check whether the trade is to be placed at market or at bid/ask price
