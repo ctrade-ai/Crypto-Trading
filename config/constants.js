@@ -92,7 +92,7 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is no
         CANCELED: "CANCELED"
     }),
     TRANSACTION_TEMPLATE = Object.freeze({
-        set: "A", // Default Set - Do not change
+        set: null,
         processId: null, // Frequency ID
         orderStatus: null, // COMPLETED || REVERSED || ERROR || REJECTED || UNDERVALUED
         consumedTime: null,
