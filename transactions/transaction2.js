@@ -41,7 +41,7 @@ async function transaction2(
         formula2 = transactionDetail.transactions[1].marketPrice + bidArray[0] - marketArray[0] / askArray[0] + bidArray[1] * 2 + marketArray[1] - 1 / askArray[1] + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3];
 
     // Check condition
-    if (formula1 < 2000 && 60 < formula2 < 1000) {
+    if ((transactionDetail.transactions[1].side === SIDE.BUY && formula1 < 2000) || (transactionDetail.transactions[1].side === SIDE.SELL && 60 < formula2 < 1000)) {
         /* Code will only run for this condition block */
 
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are met; Progressing`);
