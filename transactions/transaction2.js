@@ -10,9 +10,9 @@ const FUNCTION_INDEX = 1,
     DELAY_STATUS_CHECK = 0;
 
     /*
-    market --> 30 attempts --> har attempt mein har 500ms mein status check karega; hua toh badiya, nahi toh next attempt.
-        attempt khatam hote na hi order
-    bid/ask --> at1empt x par sirf 1 second wait karn hai
+        market --> 30 attempts --> har attempt mein har 500ms mein status check karega; hua toh badiya, nahi toh next attempt.
+            attempt khatam hote na hi order
+        bid/ask --> attempt x par sirf 1 second wait karn hai
     */
 
 async function transaction2(
@@ -69,7 +69,7 @@ async function transaction2(
                     type: TYPE.LIMIT,
                     timeInForce: TIME_IN_FORCE.GTC,
                     quantity: quantity
-                }, true),
+                }),
                 updatedValues = {
                     orderId: executionResponse.orderId,
                     cummulativeQuoteQty: executionResponse.cummulativeQuoteQty,
