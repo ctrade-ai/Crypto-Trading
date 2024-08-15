@@ -29,7 +29,7 @@ async function mainLoop() {
             logger.info(`Time taken by ${processId}: ${timeTaken}s`);
 
             /* Uncomment the return statement below to run only a single process */
-            // return;
+            return;
         }
     }
 }

@@ -31,7 +31,7 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is im
                 { symbol: "AIUSDT", side: "BUY" },
                 { symbol: "AIBTC", side: "SELL" },
                 { symbol: "MANABTC", side: "BUY" },
-                { symbol: "MANAUSDT", side: "SELL" }
+                // { symbol: "MANAUSDT", side: "SELL" }
             ]
         },
         "B": {
@@ -47,8 +47,8 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is im
     TRANSACTION_ATTEMPTS = Object.freeze({ // User-specific
         TRANSACTION_1: 2,
         TRANSACTION_2: {
-            MARKET: 1,
-            ASK_BUY: 2
+            MARKET: 30,
+            ASK_BUY: 1
         }
     }),
     /* DO NOT CHANGE ANYTHING BELOW THIS LINE */

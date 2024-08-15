@@ -13,7 +13,7 @@ async function transaction4(
 ) {
     if (CONDITION_SETS[transactionDetail.set].trades.length === 3) {
         // Only 3 coin pairs are used instaed of original 4
-        return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.COMPLETED, "Sub-process completed; Terminating branch");
+        return endSubProcess(transactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.COMPLETED, "Sub-process completed; Terminating branch");
     }
 
     let orderInfo;

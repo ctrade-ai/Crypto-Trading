@@ -152,7 +152,7 @@ function createTransactionDetail(transactionDetail, set) {
     const conditionSet = CONDITION_SETS[set].trades,
         updatedDetail = JSON.parse(JSON.stringify(transactionDetail));
 
-    transactionDetail["set"] = set;
+    updatedDetail["set"] = set;
     conditionSet.forEach((condition, index) => {
         const symbolDetails = SYMBOLS[condition.symbol];
 

@@ -1,5 +1,5 @@
 const { executeOrder, fetchBidAskPrices, checkOrderStatus, cancelOrder, fetchMarketPrices } = require("../api/trading");
-const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE } = require("../config/constants");
+const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE, SYMBOLS } = require("../config/constants");
 const { updateAllPrices, getOrderInfo, updateTransactionDetail, handleSubProcessError, mapPriceResponseToOrder } = require("../utils/helpers");
 const logger = require("../utils/logger");
 const transaction3 = require("./transaction3");
@@ -9,6 +9,12 @@ const FUNCTION_INDEX = 1,
     ITERATION_TIME = 1000, // Time in ms
     DELAY_STATUS_CHECK = 0;
 
+    /*
+    market --> 30 attempts --> har attempt mein har 500ms mein status check karega; hua toh badiya, nahi toh next attempt.
+        attempt khatam hote na hi order
+    bid/ask --> at1empt x par sirf 1 second wait karn hai
+    */
+
 async function transaction2(
     transactionDetail,
     quantity,
@@ -17,6 +23,7 @@ async function transaction2(
 ) {
     if (attempts <= 0) {
         if (isMarketPrice) {
+            // cancel karo
             isMarketPrice = false;
             attempts = TRANSACTION_ATTEMPTS.TRANSACTION_2.ASK_BUY;
             logger.info(`${transactionDetail.processId} - Nothing filled at market order from function ${FUNCTION_INDEX + 1}; Now making an re-attempt at ask/bid price`);
@@ -37,8 +44,8 @@ async function transaction2(
         askArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.ASK_PRICE),
         marketArray = mapPriceResponseToOrder(symbolArray, marketPrices, PRICE_TYPE.MARKET_PRICE),
         /* User-defined formulas */
-        formula1 = transactionDetail.transactions[0].executedPrice + bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
-        formula2 = transactionDetail.transactions[1].marketPrice + bidArray[0] - marketArray[0] / askArray[0] + bidArray[1] * 2 + marketArray[1] - 1 / askArray[1] + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3];
+        formula1 = parseFloat(transactionDetail.transactions[0].executedPrice) + bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
+        formula2 = parseFloat(transactionDetail.transactions[1].marketPrice) + bidArray[0] - marketArray[0] / askArray[0] + bidArray[1] * 2 + marketArray[1] - 1 / askArray[1] + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3];
 
     // Check condition
     if ((transactionDetail.transactions[1].side === SIDE.BUY && formula1 < 2000) || (transactionDetail.transactions[1].side === SIDE.SELL && 60 < formula2 < 1000)) {
@@ -87,6 +94,7 @@ async function transaction2(
             handleSubProcessError(error, transactionDetail, FUNCTION_INDEX, quantity);
         }
     } else {
+        // Cancel bhi karna padega
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are not met; Reversing order`);
         return reverseTransaction1(transactionDetail, quantity, true); // Reverse order
     }
@@ -150,8 +158,6 @@ async function cancelOpenOrder(transactionDetail, quantity, attempts, isMarketPr
                     repeatQty = cancelResponse.executedQty;
                 }
 
-                // AIBTC
-
                 const remainingAssetQty = (parseFloat(quantity) - parseFloat(repeatQty)).toString();
 
                  // Run both transactions in parallel and return their results
@@ -207,6 +213,11 @@ async function checkOrderStatusInLoop(transactionDetail, quantity, attempts, isM
         }
 
         // No time is remaining, cancel the current order and make a reattempt (if remaining) when the order gets canceled
+
+        if (isMarketPrice) {
+            // Do not c
+        }
+
         return cancelOpenOrder(newTransactionDetail, quantity, attempts, isMarketPrice);
     }
 }
