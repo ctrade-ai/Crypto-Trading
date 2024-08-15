@@ -45,13 +45,17 @@ const TRANSACTION_TEMPLATE = Object.freeze({
     orderStatus: null,
     consumedTime: null,
     transactions: [
-        { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: null, marketPrice: null, bidPrice: null, askPrice: null },
+        { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: "24", marketPrice: null, bidPrice: null, askPrice: null },
         { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: null, marketPrice: null, bidPrice: null, askPrice: null },
         { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: null, marketPrice: null, bidPrice: null, askPrice: null },
         { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: null, marketPrice: null, bidPrice: null, askPrice: null },
         { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: null, marketPrice: null, bidPrice: null, askPrice: null }
     ]
 });
+
+console.log(Object.keys(SYMBOLS));
+
+console.log(TRANSACTION_TEMPLATE.transactions[0].executedPrice);
 
 function createTransactionDetail(set) {
     // Get the condition set based on the provided condition

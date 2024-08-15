@@ -1,5 +1,5 @@
 const { executeOrder, fetchBidAskPrices, checkOrderStatus, cancelOrder, fetchMarketPrices } = require("../api/trading");
-const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE, TRANSACTION_STATUS } = require("../config/constants");
+const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE, TRANSACTION_STATUS, SYMBOLS } = require("../config/constants");
 const { updateAllPrices, getOrderInfo, updateTransactionDetail, handleSubProcessError, mapPriceResponseToOrder, createTransactionDetail, endSubProcess } = require("../utils/helpers");
 const logger = require("../utils/logger");
 const transaction2 = require("./transaction2");
@@ -26,7 +26,7 @@ async function transaction1(
             fetchMarketPrices(),
             fetchBidAskPrices()
         ]),
-        symbolArray = CONDITION_SETS["A"].trades.map(item => item.symbol),
+        symbolArray = Object.keys(SYMBOLS),
         bidArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.BID_PRICE),
         askArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.ASK_PRICE),
         marketArray = mapPriceResponseToOrder(symbolArray, marketPrices, PRICE_TYPE.MARKET_PRICE);

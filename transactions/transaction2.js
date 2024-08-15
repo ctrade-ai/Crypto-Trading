@@ -32,7 +32,7 @@ async function transaction2(
             fetchMarketPrices(),
             fetchBidAskPrices()
         ]),
-        symbolArray = CONDITION_SETS[transactionDetail.set].trades.map(item => item.symbol),
+        symbolArray = Object.keys(SYMBOLS),
         bidArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.BID_PRICE),
         askArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.ASK_PRICE),
         marketArray = mapPriceResponseToOrder(symbolArray, marketPrices, PRICE_TYPE.MARKET_PRICE),

@@ -1,4 +1,4 @@
-const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is not maintained)
+const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is important for formula calculation)
         AIUSDT: {
             qtyPrecision: 1,
             pricePrecision: 3,
