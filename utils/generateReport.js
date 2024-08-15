@@ -1,21 +1,22 @@
 const fs = require("fs").promises;
 const path = require("path");
 
-const { TRANSACTION_STATUS, UNIDENTIFIED_PROCESS } = require("../config/constants");
+const { TRANSACTION_STATUS, UNIDENTIFIED } = require("../config/constants");
 const logger = require("./logger");
 
 function jsonToCsv(data, includeHeader) {
-    const processId = data.processId || UNIDENTIFIED_PROCESS,
-        symbols = data.transactions.map(tx => tx.symbol).join(","),
+    const processId = data.processId || UNIDENTIFIED,
+        set = data.set || UNIDENTIFIED,
         orderStatus = data.orderStatus || TRANSACTION_STATUS.REVERSED,
+        symbols = data.transactions.map(tx => tx.symbol).join(","),
         sidesArray = data.transactions.map(tx => tx.side).join(","),
         cummulativeQtyArray = data.transactions.map(tx => tx.cummulativeQuoteQty || 0).join(","),
         executedQtyArray = data.transactions.map(tx => tx.executedQty || 0).join(","),
         executedPriceArray = data.transactions.map(tx => tx.executedPrice || 0).join(","),
         consumedTime = data.consumedTime;
 
-    const csvHeader = "processId,orderStatus,symbol1,symbol2,symbol3,symbol4,symbolR,side1,side2,side3,side4,sideR,cummulativeQty1,cummulativeQty2,cummulativeQty3,cummulativeQty4,cummulativeQtyR,executedQty1,executedQty2,executedQty3,executedQty4,executedQtyR,executedPrice1,executedPrice2,executedPrice3,executedPrice4,executedPriceR,consumedTime\n",
-        csvRow = `${processId},${orderStatus},${symbols},${sidesArray},${cummulativeQtyArray},${executedQtyArray},${executedPriceArray},${consumedTime}s\n`;
+    const csvHeader = "processId,set,orderStatus,symbol1,symbol2,symbol3,symbol4,symbolR,side1,side2,side3,side4,sideR,cummulativeQty1,cummulativeQty2,cummulativeQty3,cummulativeQty4,cummulativeQtyR,executedQty1,executedQty2,executedQty3,executedQty4,executedQtyR,executedPrice1,executedPrice2,executedPrice3,executedPrice4,executedPriceR,consumedTime\n",
+        csvRow = `${processId},${set},${orderStatus},${symbols},${sidesArray},${cummulativeQtyArray},${executedQtyArray},${executedPriceArray},${consumedTime}s\n`;
 
     return includeHeader? csvHeader + csvRow : csvRow;
 }

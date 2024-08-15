@@ -22,7 +22,7 @@ async function transaction2(
     isMarketPrice = true
 ) {
     if (attempts <= 0) {
-        if (isMarketPrice) {
+        if (isMarketPrice && TRANSACTION_ATTEMPTS.TRANSACTION_2.ASK_BUY > 0) {
             // cancel karo
             isMarketPrice = false;
             attempts = TRANSACTION_ATTEMPTS.TRANSACTION_2.ASK_BUY;

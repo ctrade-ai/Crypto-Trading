@@ -80,7 +80,7 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is im
         ERROR: "ERROR",
         REJECTED: "REJECTED"
     }),
-    UNIDENTIFIED_PROCESS = "UNIDENTIFIED_PROCESS",
+    UNIDENTIFIED = "UNIDENTIFIED",
     ERROR_CODE = Object.freeze({
         INSUFFICIENT_QUANTITY: "INSUFFICIENT_QUANTITY"
     }),
@@ -92,8 +92,8 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is im
         CANCELED: "CANCELED"
     }),
     TRANSACTION_TEMPLATE = Object.freeze({
-        set: null,
         processId: null, // Frequency ID
+        set: null,
         orderStatus: null, // COMPLETED || REVERSED || ERROR || REJECTED || UNDERVALUED
         consumedTime: null,
         transactions: [
@@ -155,7 +155,7 @@ module.exports = {
     TIME_IN_FORCE,
     SELECTED_PRICE,
     TRANSACTION_STATUS,
-    UNIDENTIFIED_PROCESS,
+    UNIDENTIFIED,
     ERROR_CODE,
     ORDER_STATUS,
     TRANSACTION_TEMPLATE
