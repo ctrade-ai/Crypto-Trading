@@ -45,17 +45,17 @@ const TRANSACTION_TEMPLATE = Object.freeze({
     orderStatus: null,
     consumedTime: null,
     transactions: [
-        { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: "24", marketPrice: null, bidPrice: null, askPrice: null },
-        { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: null, marketPrice: null, bidPrice: null, askPrice: null },
+        { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: "24", marketPrice: "10", bidPrice: null, askPrice: null },
+        { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: null, marketPrice: "20", bidPrice: null, askPrice: null },
         { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: null, marketPrice: null, bidPrice: null, askPrice: null },
         { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: null, marketPrice: null, bidPrice: null, askPrice: null },
         { orderId: null, cummulativeQuoteQty: null, executedQty: null, executedPrice: null, marketPrice: null, bidPrice: null, askPrice: null }
     ]
 });
 
-console.log(Object.keys(SYMBOLS));
+// console.log(Object.keys(SYMBOLS));
 
-console.log(TRANSACTION_TEMPLATE.transactions[0].executedPrice);
+// console.log(TRANSACTION_TEMPLATE.transactions[0].executedPrice);
 
 function createTransactionDetail(set) {
     // Get the condition set based on the provided condition
@@ -96,21 +96,23 @@ function createTransactionDetail(set) {
     return transactionDetail;
 }
 
-console.log(Object.keys(SYMBOLS));
+console.log("hello", TRANSACTION_TEMPLATE.transactions[1].marketPrice);
 
-// Extract symbols for Condition Set A
-const symbolsA = CONDITION_SETS.A.map(item => item.symbol);
+// console.log(Object.keys(SYMBOLS));
 
-// Extract symbols for Condition Set B
-const symbolsB = CONDITION_SETS.B.map(item => item.symbol);
+// // Extract symbols for Condition Set A
+// const symbolsA = CONDITION_SETS.A.map(item => item.symbol);
 
-console.log("Symbols for Condition Set A:", symbolsA);
-console.log("Symbols for Condition Set B:", symbolsB);
+// // Extract symbols for Condition Set B
+// const symbolsB = CONDITION_SETS.B.map(item => item.symbol);
+
+// console.log("Symbols for Condition Set A:", symbolsA);
+// console.log("Symbols for Condition Set B:", symbolsB);
 
 
-// Example usage
-const transactionDetailA = createTransactionDetail("A");
-const transactionDetailB = createTransactionDetail("B");
+// // Example usage
+// const transactionDetailA = createTransactionDetail("A");
+// const transactionDetailB = createTransactionDetail("B");
 
-console.log("Transaction Detail for Condition A:", transactionDetailA);
-console.log("Transaction Detail for Condition B:", transactionDetailB);
+// console.log("Transaction Detail for Condition A:", transactionDetailA);
+// console.log("Transaction Detail for Condition B:", transactionDetailB);
