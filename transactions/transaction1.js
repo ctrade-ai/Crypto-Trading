@@ -36,17 +36,20 @@ async function transaction1(
 
     // Check condition
     if (formula1 < 50 && 60 < formula2 < 100) { // Set A
-        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Condition are met; Using Set A`);
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Condition 1 met; Using Set A`);
         builtTransactionDetail = createTransactionDetail(transactionDetail, "A");
 
         /* Changed initial quantity based on set A */
         quantity = quantity?? CONDITION_SETS["A"].inititialQty;
-    } else { // Set B
-        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are not met; Using Set B`);
+    } else if (formula1 > 10) { // Set B
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions 2 is met; Using Set B`);
         builtTransactionDetail = createTransactionDetail(transactionDetail, "B");
 
          /* Changed initial quantity based on set B */
          quantity = quantity?? CONDITION_SETS["B"].inititialQty;
+    } else {
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are not met`);
+        return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REJECTED, `Sub-process rejected: Order did not get executed as conditions were not met; Terminating branch`);
     }
 
     logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Created transaction detail - ${JSON.stringify(builtTransactionDetail)}`);
