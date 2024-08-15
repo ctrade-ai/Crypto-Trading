@@ -51,6 +51,7 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is no
             ASK_BUY: 2
         }
     }),
+    /* DO NOT CHANGE ANYTHING BELOW THIS LINE */
     PRICE_TYPE = Object.freeze({
         MARKET_PRICE: "price",
         ASK_PRICE: "askPrice",
