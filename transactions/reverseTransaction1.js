@@ -1,14 +1,16 @@
 const { executeOrder, checkOrderStatus, cancelOrder, fetchBidAskPrices } = require("../api/trading");
-const { TYPE, TRANSACTION_STATUS, TIME_IN_FORCE, ORDER_STATUS, SIDE } = require("../config/constants");
+const { TYPE, TIME_IN_FORCE, ORDER_STATUS, SIDE } = require("../config/constants");
 const { endSubProcess, getOrderInfo, updateTransactionDetail, handleSubProcessError, updateAllPrices } = require("../utils/helpers");
 const logger = require("../utils/logger");
 
 const FUNCTION_INDEX = 4,
-    ITERATION_TIME = 1000; // Time in ms
+    ITERATION_TIME = 1000, // Time in ms
+    DELAY_STATUS_CHECK = 0;
 
 async function reverseTransaction1(
     transactionDetail,
-    quantity
+    quantity,
+    status
 ) {
     const bidAskPrices = await fetchBidAskPrices(),
         updatedTransactionDetail = updateAllPrices(transactionDetail, { bidAskPrices }),
@@ -38,16 +40,17 @@ async function reverseTransaction1(
 
         if (executionResponse.status === ORDER_STATUS.FILLED) {
             logger.info(`${transactionDetail.processId} - Order ${executionResponse.status} at function ${FUNCTION_INDEX + 1}`);
-            return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REVERSED, "Sub-process completed; Terminating branch");
+            return endSubProcess(newTransactionDetail, FUNCTION_INDEX, status, "Sub-process completed; Terminating branch");
         } else {
-            return checkOrderStatusInLoop(newTransactionDetail, quantity, performance.now()); // Start timer
+            await new Promise(resolve => setTimeout(resolve, DELAY_STATUS_CHECK)); // Wait and then check status
+            return checkOrderStatusInLoop(newTransactionDetail, quantity, performance.now(), status); // Start timer
         }
     } catch(error) {
         handleSubProcessError(error, transactionDetail, FUNCTION_INDEX, quantity);
     }
 }
 
-async function checkAndProcessOrder(transactionDetail, error) {
+async function checkAndProcessOrder(transactionDetail, status, error) {
     const statusResponse = await checkOrderStatus({
             symbol: transactionDetail.transactions[FUNCTION_INDEX].symbol,
             orderId: transactionDetail.transactions[FUNCTION_INDEX].orderId
@@ -66,14 +69,14 @@ async function checkAndProcessOrder(transactionDetail, error) {
     if (statusResponse.status === ORDER_STATUS.FILLED) {
         logger.info(`${transactionDetail.processId} - Order already filled at function ${FUNCTION_INDEX + 1}`);
 
-        return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REVERSED, "Sub-process completed; Terminating branch");
+        return endSubProcess(newTransactionDetail, FUNCTION_INDEX, status, "Sub-process completed; Terminating branch");
     } else {
         // Something unusual
         logger.error(`${transactionDetail.processId} - [UNUSUAL CANCEL] Order ID: ${transactionDetail.transactions[FUNCTION_INDEX].orderId} at function ${FUNCTION_INDEX + 1} - ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`);
     }
 }
 
-async function cancelOpenOrder(transactionDetail, quantity) {
+async function cancelOpenOrder(transactionDetail, quantity, status) {
     try {
         const cancelResponse = await cancelOrder({
                 symbol: transactionDetail.transactions[FUNCTION_INDEX].symbol,
@@ -109,24 +112,24 @@ async function cancelOpenOrder(transactionDetail, quantity) {
                 // Run both transactions in parallel and return their results
                 return Promise.allSettled([
                     reverseTransaction1(newTransactionDetail, remainingAssetQty).catch(error => handleSubProcessError(error, newTransactionDetail, FUNCTION_INDEX, remainingAssetQty)),
-                    endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REVERSED, "Sub-process completed; Terminating branch").catch(error => handleSubProcessError(error, newTransactionDetail, FUNCTION_INDEX, passQty))
+                    endSubProcess(newTransactionDetail, FUNCTION_INDEX, status, "Sub-process completed; Terminating branch").catch(error => handleSubProcessError(error, newTransactionDetail, FUNCTION_INDEX, passQty))
                 ]);
             } else { // Nothing got filled
-                return reverseTransaction1(newTransactionDetail, quantity);
+                return reverseTransaction1(newTransactionDetail, quantity, status);
             }
         } else {
             logger.info(`${transactionDetail.processId} - Order failed to cancel (based on status) at function ${FUNCTION_INDEX + 1}: No open orders`);
             // Check if the order was already executed
-            return checkAndProcessOrder(transactionDetail);
+            return checkAndProcessOrder(transactionDetail, status);
         }
     } catch(error) {
         logger.info(`${transactionDetail.processId} - Order failed to cancel (based on error) at function ${FUNCTION_INDEX + 1}: No open orders`);
         // Check if the order was already executed
-        return checkAndProcessOrder(transactionDetail, error);
+        return checkAndProcessOrder(transactionDetail, status, error);
     }
 }
 
-async function checkOrderStatusInLoop(transactionDetail, quantity, start) {
+async function checkOrderStatusInLoop(transactionDetail, quantity, start, status) {
     const statusResponse = await checkOrderStatus({
             symbol: transactionDetail.transactions[FUNCTION_INDEX].symbol,
             orderId: transactionDetail.transactions[FUNCTION_INDEX].orderId
@@ -144,19 +147,19 @@ async function checkOrderStatusInLoop(transactionDetail, quantity, start) {
 
     if (statusResponse.status === ORDER_STATUS.FILLED) {
         logger.info(`${transactionDetail.processId} - Order fully executed at function ${FUNCTION_INDEX + 1}`);
-        return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REVERSED, "Sub-process completed; Terminating branch");
+        return endSubProcess(newTransactionDetail, FUNCTION_INDEX, status, "Sub-process completed; Terminating branch");
     } else { // Partial or empty case
-        const end = performance.now(); // End timer
-
         logger.info(`${transactionDetail.processId} - Order not fully executed at function ${FUNCTION_INDEX + 1} yet`);
+        const end = performance.now(); // End timer
 
         if (end - start < ITERATION_TIME) { // Time is remaining
             logger.info(`${transactionDetail.processId} - Re-checking order status at function ${FUNCTION_INDEX + 1}`);
-            return checkOrderStatusInLoop(newTransactionDetail, quantity, start);
+            await new Promise(resolve => setTimeout(resolve, DELAY_STATUS_CHECK)); // Wait and then check status
+            return checkOrderStatusInLoop(newTransactionDetail, quantity, start, status);
         }
 
         // No time is remaining, cancel the current order and make a reattempt (if remaining) when the order gets canceled
-        return cancelOpenOrder(newTransactionDetail, quantity);
+        return cancelOpenOrder(newTransactionDetail, quantity, status);
     }
 }
 

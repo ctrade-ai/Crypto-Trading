@@ -4,7 +4,8 @@ const { endSubProcess, getOrderInfo, updateTransactionDetail, handleSubProcessEr
 const logger = require("../utils/logger");
 
 const FUNCTION_INDEX = 3,
-    ITERATION_TIME = 1000; // Time in ms
+    ITERATION_TIME = 1000, // Time in ms
+    DELAY_STATUS_CHECK = 0;
 
 async function transaction4(
     transactionDetail,
@@ -54,6 +55,7 @@ async function transaction4(
             logger.info(`${transactionDetail.processId} - Order ${executionResponse.status} at function ${FUNCTION_INDEX + 1}`);
             return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.COMPLETED, "Sub-process completed; Terminating branch");
         } else {
+            await new Promise(resolve => setTimeout(resolve, DELAY_STATUS_CHECK)); // Wait and then check status
             return checkOrderStatusInLoop(newTransactionDetail, quantity, performance.now()); // Start timer
         }
     } catch(error) {
@@ -160,12 +162,12 @@ async function checkOrderStatusInLoop(transactionDetail, quantity, start) {
         logger.info(`${transactionDetail.processId} - Order fully executed at function ${FUNCTION_INDEX + 1}`);
         return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.COMPLETED, "Sub-process completed; Terminating branch");
     } else { // Partial or empty case
-        const end = performance.now(); // End timer
-
         logger.info(`${transactionDetail.processId} - Order not fully executed at function ${FUNCTION_INDEX + 1} yet`);
+        const end = performance.now(); // End timer
 
         if (end - start < ITERATION_TIME) { // Time is remaining
             logger.info(`${transactionDetail.processId} - Re-checking order status at function ${FUNCTION_INDEX + 1}`);
+            await new Promise(resolve => setTimeout(resolve, DELAY_STATUS_CHECK)); // Wait and then check status
             return checkOrderStatusInLoop(newTransactionDetail, quantity, start);
         }
 

@@ -1,35 +1,35 @@
 const { executeOrder, fetchBidAskPrices, checkOrderStatus, cancelOrder, fetchMarketPrices } = require("../api/trading");
-const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE, CONDITION_SETS, PRICE_TYPE, SYMBOLS } = require("../config/constants");
+const { ORDER_STATUS, TRANSACTION_ATTEMPTS, TYPE, TIME_IN_FORCE, SIDE, PRICE_TYPE, SYMBOLS, TRANSACTION_STATUS } = require("../config/constants");
 const { updateAllPrices, getOrderInfo, updateTransactionDetail, handleSubProcessError, mapPriceResponseToOrder } = require("../utils/helpers");
 const logger = require("../utils/logger");
 const transaction3 = require("./transaction3");
 const reverseTransaction1 = require("./reverseTransaction1");
 
 const FUNCTION_INDEX = 1,
-    ITERATION_TIME = 1000, // Time in ms
+    ITERATION_TIME_MARKET = 1000, // Time in ms
+    ITERATION_TIME_BID_ASK = 2000,
     DELAY_STATUS_CHECK = 0;
-
-    /*
-        market --> 30 attempts --> har attempt mein har 500ms mein status check karega; hua toh badiya, nahi toh next attempt.
-            attempt khatam hote na hi order
-        bid/ask --> attempt x par sirf 1 second wait karn hai
-    */
 
 async function transaction2(
     transactionDetail,
     quantity,
     attempts = TRANSACTION_ATTEMPTS.TRANSACTION_2.MARKET,
-    isMarketPrice = true
+    isMarketPrice = true,
+    shouldPlaceOrder = true
 ) {
     if (attempts <= 0) {
-        if (isMarketPrice && TRANSACTION_ATTEMPTS.TRANSACTION_2.ASK_BUY > 0) {
-            // cancel karo
-            isMarketPrice = false;
-            attempts = TRANSACTION_ATTEMPTS.TRANSACTION_2.ASK_BUY;
-            logger.info(`${transactionDetail.processId} - Nothing filled at market order from function ${FUNCTION_INDEX + 1}; Now making an re-attempt at ask/bid price`);
+        if (isMarketPrice) {
+            logger.info(`${transactionDetail.processId} - Nothing filled at market order from function ${FUNCTION_INDEX + 1}`);
+
+            return cancelOpenOrder(
+                transactionDetail,
+                quantity,
+                TRANSACTION_ATTEMPTS.TRANSACTION_2.BID_ASK + 1, // Cancel function reduces attempts
+                false // Next order should not be a market order
+            );
         } else {
-            logger.info(`${transactionDetail.processId} - Remaining quantity ${quantity} at function ${FUNCTION_INDEX + 1}: Partial`);
-            return reverseTransaction1(transactionDetail, quantity); // Reverse order
+            logger.info(`${transactionDetail.processId} - Nothing got filled at both market and bid/ask price; Remaining quantity ${quantity} at function ${FUNCTION_INDEX + 1}: Partial`);
+            return reverseTransaction1(transactionDetail, quantity, TRANSACTION_STATUS.REVERSED_ATTEMPT); // Reverse order
         }
     }
 
@@ -44,18 +44,30 @@ async function transaction2(
         askArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.ASK_PRICE),
         marketArray = mapPriceResponseToOrder(symbolArray, marketPrices, PRICE_TYPE.MARKET_PRICE),
         /* User-defined formulas */
-        formula1 = parseFloat(transactionDetail.transactions[0].executedPrice) + bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
+        formula1 = parseFloat(transactionDetail.transactions[0].cummulativeQuoteQty) + parseFloat(transactionDetail.transactions[0].executedPrice) + bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
         formula2 = parseFloat(transactionDetail.transactions[1].marketPrice) + bidArray[0] - marketArray[0] / askArray[0] + bidArray[1] * 2 + marketArray[1] - 1 / askArray[1] + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3];
+        formula3 = parseFloat(transactionDetail.transactions[0].executedPrice) + bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
+        formula4 = parseFloat(transactionDetail.transactions[1].marketPrice) + bidArray[0] - marketArray[0] / askArray[0] + bidArray[1] * 2 + marketArray[1] - 1 / askArray[1] + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
+        side = transactionDetail.transactions[1].side;
 
     // Check condition
-    if ((transactionDetail.transactions[1].side === SIDE.BUY && formula1 < 2000) || (transactionDetail.transactions[1].side === SIDE.SELL && 60 < formula2 < 1000)) {
+    if (
+        (isMarketPrice && side === SIDE.BUY && formula1) ||     // Buying at Market Price
+        (isMarketPrice && side === SIDE.SELL && formula2) ||    // Selling at Market Price
+        (!isMarketPrice && side === SIDE.BUY && formula3) ||    // Buying at Bid/Ask Price --> Ask
+        (!isMarketPrice && side === SIDE.SELL && formula4)      // Selling at Bid/Ask Price --> Bid
+    ) {
         /* Code will only run for this condition block */
 
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are met; Progressing`);
 
+        if (isMarketPrice && !shouldPlaceOrder) {
+            return checkOrderStatusInLoop(transactionDetail, quantity, attempts, isMarketPrice, performance.now()); // Start timer
+        }
+
         const updatedTransactionDetail = updateAllPrices(transactionDetail, {
                 // marketPrices: isMarketPrice? marketPrices : undefined,
-                bidAskPrices: !isMarketPrice ? bidAskPrices : undefined
+                bidAskPrices: !isMarketPrice? bidAskPrices : undefined
             }),
             orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX, isMarketPrice); // Last parameter is used to check whether the trade is to be placed at market or at bid/ask price
 
@@ -94,9 +106,8 @@ async function transaction2(
             handleSubProcessError(error, transactionDetail, FUNCTION_INDEX, quantity);
         }
     } else {
-        // Cancel bhi karna padega
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are not met; Reversing order`);
-        return reverseTransaction1(transactionDetail, quantity, true); // Reverse order
+        return reverseTransaction1(transactionDetail, quantity, TRANSACTION_STATUS.REVERSED_CONDITION); // Reverse order
     }
 }
 
@@ -202,22 +213,24 @@ async function checkOrderStatusInLoop(transactionDetail, quantity, attempts, isM
 
         return transaction3(newTransactionDetail, passQty);
     } else { // Partial or empty case
-        const end = performance.now(); // End timer
-
         logger.info(`${transactionDetail.processId} - Order not fully executed at function ${FUNCTION_INDEX + 1} yet`);
+        const end = performance.now(), // End timer
+            iterationTime = isMarketPrice? ITERATION_TIME_MARKET : ITERATION_TIME_BID_ASK;
 
-        if (end - start < ITERATION_TIME) { // Time is remaining
+        if (end - start < iterationTime) { // Time is remaining
             logger.info(`${transactionDetail.processId} - Re-checking order status at function ${FUNCTION_INDEX + 1}`);
             await new Promise(resolve => setTimeout(resolve, DELAY_STATUS_CHECK)); // Wait and then check status
             return checkOrderStatusInLoop(newTransactionDetail, quantity, attempts, isMarketPrice, start);
         }
 
-        // No time is remaining, cancel the current order and make a reattempt (if remaining) when the order gets canceled
+        // No time is remaining
 
         if (isMarketPrice) {
-            // Do not c
+            // Do not cancel just make a reattempt
+            return transaction2(newTransactionDetail, quantity, attempts - 1, isMarketPrice, false);
         }
 
+        // Cancel the current order and make a reattempt (if remaining) when the order gets canceled
         return cancelOpenOrder(newTransactionDetail, quantity, attempts, isMarketPrice);
     }
 }

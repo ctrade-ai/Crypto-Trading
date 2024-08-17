@@ -42,6 +42,10 @@ function updateAllPrices(transactionDetail, {
     marketPrices,
     bidAskPrices
 }) {
+    if (!marketPrices && !bidAskPrices) {
+        return transactionDetail;
+    }
+    
     const updatedDetail = JSON.parse(JSON.stringify(transactionDetail)); // Copy to preserve original
 
     updatedDetail.transactions = updatedDetail.transactions.map(transaction => {

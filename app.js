@@ -5,6 +5,8 @@ const { TRANSACTION_TEMPLATE } = require("./config/constants");
 const transaction1 = require("./transactions/transaction1");
 const logger = require("./utils/logger");
 
+const WAIT_TIME = 1000; // Time in ms
+
 // Infinite loop to keep running indefinitely
 async function mainLoop() {
     const transactionDetail = JSON.parse(JSON.stringify(TRANSACTION_TEMPLATE));
@@ -28,8 +30,12 @@ async function mainLoop() {
 
             logger.info(`Time taken by ${processId}: ${timeTaken}s`);
 
+            if (timeTaken < 1) { // Time in seconds
+                await new Promise(resolve => setTimeout(resolve, WAIT_TIME)); // Wait and then restart
+            }
+
             /* Uncomment the return statement below to run only a single process */
-            return;
+            // return;
         }
     }
 }

@@ -5,7 +5,8 @@ const logger = require("../utils/logger");
 const transaction2 = require("./transaction2");
 
 const FUNCTION_INDEX = 0,
-    ITERATION_TIME = 1000; // Time in ms
+    ITERATION_TIME = 2000, // Time in ms
+    DELAY_STATUS_CHECK = 0;
 
 async function transaction1(
     transactionDetail,
@@ -15,7 +16,7 @@ async function transaction1(
     if (attempts <= 0) {
         // Leave aside the remaining quantity
         logger.info(`${transactionDetail.processId} - Remaining quantity ${quantity} at function ${FUNCTION_INDEX + 1}: Partial completion - Terminating with remaining quantity`);
-        return endSubProcess(transactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REJECTED, `Sub-process rejected: Order did not get executed in any attempt; Terminating branch`);
+        return endSubProcess(transactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REJECTED_ATTEMPT, `Sub-process rejected: Order did not get executed in any attempt; Terminating branch`);
     }
 
     logger.info(`${transactionDetail.processId} - Attempts remaining - ${attempts} at function ${FUNCTION_INDEX + 1}`);
@@ -31,7 +32,7 @@ async function transaction1(
         askArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.ASK_PRICE),
         marketArray = mapPriceResponseToOrder(symbolArray, marketPrices, PRICE_TYPE.MARKET_PRICE);
         /* User-defined formulas */
-        formula1 = bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
+        formula1 = quantity??CONDITION_SETS["A"].inititialQty + bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
         formula2 = bidArray[0] - marketArray[0] / askArray[0] + bidArray[1] * 2 + marketArray[1] - 1 / askArray[1] + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3];
 
     // Check condition
@@ -42,14 +43,14 @@ async function transaction1(
         /* Changed initial quantity based on set A */
         quantity = quantity?? CONDITION_SETS["A"].inititialQty;
     } else if (formula1 > 10) { // Set B
-        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions 2 is met; Using Set B`);
+        logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Condition 2 is met; Using Set B`);
         builtTransactionDetail = createTransactionDetail(transactionDetail, "B");
 
-         /* Changed initial quantity based on set B */
-         quantity = quantity?? CONDITION_SETS["B"].inititialQty;
+        /* Changed initial quantity based on set B */
+        quantity = quantity?? CONDITION_SETS["B"].inititialQty;
     } else {
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Conditions are not met`);
-        return endSubProcess(transactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REJECTED, `Sub-process rejected: Order did not get executed as conditions were not met; Terminating branch`);
+        return endSubProcess(transactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.REJECTED_CONDITION, `Sub-process rejected: Order did not get executed as conditions were not met; Terminating branch`);
     }
 
     logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Created transaction detail - ${JSON.stringify(builtTransactionDetail)}`);
@@ -85,6 +86,7 @@ async function transaction1(
 
             return transaction2(newTransactionDetail, passQty);
         } else {
+            await new Promise(resolve => setTimeout(resolve, DELAY_STATUS_CHECK)); // Wait and then check status
             return checkOrderStatusInLoop(newTransactionDetail, quantity, attempts, performance.now()); // Start timer
         }
     } catch(error) {
@@ -194,12 +196,12 @@ async function checkOrderStatusInLoop(transactionDetail, quantity, attempts, sta
 
         return transaction2(newTransactionDetail, passQty);
     } else { // Partial or empty case
-        const end = performance.now(); // End timer
-
         logger.info(`${transactionDetail.processId} - Order not fully executed at function ${FUNCTION_INDEX + 1} yet`);
+        const end = performance.now(); // End timer
 
         if (end - start < ITERATION_TIME) { // Time is remaining
             logger.info(`${transactionDetail.processId} - Re-checking order status at function ${FUNCTION_INDEX + 1}`);
+            await new Promise(resolve => setTimeout(resolve, DELAY_STATUS_CHECK)); // Wait and then check status
             return checkOrderStatusInLoop(newTransactionDetail, quantity, attempts, start);
         }
 

@@ -26,21 +26,20 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is im
     }),
     CONDITION_SETS = Object.freeze({
         "A": {
-            inititialQty: 500,
+            inititialQty: 10,
             trades: [
                 { symbol: "AIUSDT", side: "BUY" },
                 { symbol: "AIBTC", side: "SELL" },
                 { symbol: "MANABTC", side: "BUY" },
-                // { symbol: "MANAUSDT", side: "SELL" }
+                { symbol: "MANAUSDT", side: "SELL" }
             ]
         },
         "B": {
-            inititialQty: 800,
+            inititialQty: 10,
             trades: [
                 { symbol: "AIUSDT", side: "SELL" },
                 { symbol: "MANAUSDT", side: "BUY" },
-                { symbol: "MANABTC", side: "SELL" },
-                { symbol: "AIBTC", side: "BUY" }
+                { symbol: "MANABTC", side: "SELL" }
             ]
         }
     }),
@@ -48,7 +47,7 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is im
         TRANSACTION_1: 2,
         TRANSACTION_2: {
             MARKET: 30,
-            ASK_BUY: 1
+            BID_ASK: 2
         }
     }),
     /* DO NOT CHANGE ANYTHING BELOW THIS LINE */
@@ -69,16 +68,14 @@ const SYMBOLS = Object.freeze({ // Specify all coin pairs used (Here order is im
         GTC: "GTC",
         IOC: "IOC"
     }),
-    SELECTED_PRICE = Object.freeze({
-        SAME: "SAME",
-        CHANGED: "CHANGED"
-    }),
     TRANSACTION_STATUS = Object.freeze({
         COMPLETED: "COMPLETED",
-        REVERSED: "REVERSED",
+        REVERSED_ATTEMPT: "REVERSED_ATTEMPT",
+        REVERSED_CONDITION: "REVERSED_CONDITION",
         UNDERVALUED: "UNDERVALUED",
         ERROR: "ERROR",
-        REJECTED: "REJECTED"
+        REJECTED_ATTEMPT: "REJECTED_ATTEMPT",
+        REJECTED_CONDITION: "REJECTED_CONDITION"
     }),
     UNIDENTIFIED = "UNIDENTIFIED",
     ERROR_CODE = Object.freeze({
@@ -153,7 +150,6 @@ module.exports = {
     SIDE,
     TYPE,
     TIME_IN_FORCE,
-    SELECTED_PRICE,
     TRANSACTION_STATUS,
     UNIDENTIFIED,
     ERROR_CODE,

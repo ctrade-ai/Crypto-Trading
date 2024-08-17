@@ -7,6 +7,12 @@
 6. To check status of processes - npm run status
 7. To clean log and CSV files on Mac/Linux - npm run clean
 
+## Count number of API calls in Logs
+1. ABRACADABRA[PRICES] - No. of API calls to fetch prices
+2. ABRACADABRA[ORDER] - No. of API calls to place an order
+3. ABRACADABRA[CANCEL] - No. of API calls to cancel an order
+4. ABRACADABRA[STATUS] - No. of API calls to check status of an order
+
 ## Command to delete log and csv files
 1. Macintosh: rm -rf csv-data log-files
 2. Windows: rd /s /q "csv-data" & rd /s /q "log-files"
