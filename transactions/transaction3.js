@@ -13,16 +13,17 @@ async function transaction3(
     quantity,
     isFirstAttempt = true
 ) {
-    let orderInfo;
+    let updatedTransactionDetail = transactionDetail,
+        orderInfo;
 
     if (isFirstAttempt) {
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1} first attempt`); // Bid/ask price
         orderInfo = getOrderInfo(transactionDetail, FUNCTION_INDEX);
     } else {
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1} consecutive attempt`);
-        const bidAskPrices = await fetchBidAskPrices(),
-            updatedTransactionDetail = updateAllPrices(transactionDetail, { bidAskPrices });
+        const bidAskPrices = await fetchBidAskPrices();
 
+        updatedTransactionDetail = updateAllPrices(transactionDetail, { bidAskPrices });
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Price updated transaction detail - ${JSON.stringify(updatedTransactionDetail)}`);
         orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
     }
@@ -43,7 +44,7 @@ async function transaction3(
                 setPrice: executionResponse.price,
                 fills: executionResponse.fills
             },
-            newTransactionDetail = updateTransactionDetail(transactionDetail, FUNCTION_INDEX, updatedValues);
+            newTransactionDetail = updateTransactionDetail(updatedTransactionDetail, FUNCTION_INDEX, updatedValues);
 
         logger.info(`${transactionDetail.processId} - Execution response from function ${FUNCTION_INDEX + 1}: ${JSON.stringify(executionResponse, null, 2)})}`);
 
@@ -57,7 +58,7 @@ async function transaction3(
             return checkOrderStatusInLoop(newTransactionDetail, quantity, performance.now()); // Start timer
         }
     } catch(error) {
-        handleSubProcessError(error, transactionDetail, FUNCTION_INDEX, quantity);
+        handleSubProcessError(error, updatedTransactionDetail, FUNCTION_INDEX, quantity);
     }
 }
 
@@ -132,7 +133,7 @@ async function cancelOpenOrder(transactionDetail, quantity) {
         } else {
             logger.info(`${transactionDetail.processId} - Order failed to cancel (based on status) at function ${FUNCTION_INDEX + 1}: No open orders`);
             // Check if the order was already executed
-            return checkAndProcessOrder(transactionDetail);
+            return checkAndProcessOrder(newTransactionDetail);
         }
     } catch(error) {
         logger.info(`${transactionDetail.processId} - Order failed to cancel (based on error) at function ${FUNCTION_INDEX + 1}: No open orders`);

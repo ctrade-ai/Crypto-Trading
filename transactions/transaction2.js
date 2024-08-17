@@ -66,6 +66,7 @@ async function transaction2(
         }
 
         const updatedTransactionDetail = updateAllPrices(transactionDetail, {
+                /* Previous market price is taken if the below line is commented */
                 // marketPrices: isMarketPrice? marketPrices : undefined,
                 bidAskPrices: !isMarketPrice? bidAskPrices : undefined
             }),
@@ -182,7 +183,7 @@ async function cancelOpenOrder(transactionDetail, quantity, attempts, isMarketPr
         } else {
             logger.info(`${transactionDetail.processId} - Order failed to cancel (based on status) at function ${FUNCTION_INDEX + 1}: No open orders`);
             // Check if the order was already executed
-            return checkAndProcessOrder(transactionDetail);
+            return checkAndProcessOrder(newTransactionDetail);
         }
     } catch(error) {
         logger.info(`${transactionDetail.processId} - Order failed to cancel (based on error) at function ${FUNCTION_INDEX + 1}: No open orders`);

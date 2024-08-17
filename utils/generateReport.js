@@ -43,7 +43,7 @@ async function saveDataToCsv(data) {
         // Ensure the directory exists
         await fs.mkdir(directoryPath, { recursive: true });
 
-        const filePath = path.join(directoryPath, "transactions.csv"),
+        const filePath = path.join(directoryPath, "report.csv"),
             fileExists = await fs.access(filePath).then(() => true).catch(() => false);
 
         const csvData = jsonToCsv(data, !fileExists); // Include header if the file does not exist

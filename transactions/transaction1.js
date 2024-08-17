@@ -32,7 +32,7 @@ async function transaction1(
         askArray = mapPriceResponseToOrder(symbolArray, bidAskPrices, PRICE_TYPE.ASK_PRICE),
         marketArray = mapPriceResponseToOrder(symbolArray, marketPrices, PRICE_TYPE.MARKET_PRICE);
         /* User-defined formulas */
-        formula1 = quantity??CONDITION_SETS["A"].inititialQty + bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
+        formula1 = quantity?? CONDITION_SETS["A"].inititialQty + bidArray[0] * (marketArray[0] + askArray[0]) + bidArray[1] * (marketArray[1] + askArray[1]) + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3],
         formula2 = bidArray[0] - marketArray[0] / askArray[0] + bidArray[1] * 2 + marketArray[1] - 1 / askArray[1] + bidArray[2] / (marketArray[2] + askArray[2]) + bidArray[3] - marketArray[3] / askArray[3];
 
     // Check condition
@@ -90,7 +90,7 @@ async function transaction1(
             return checkOrderStatusInLoop(newTransactionDetail, quantity, attempts, performance.now()); // Start timer
         }
     } catch(error) {
-        handleSubProcessError(error, transactionDetail, FUNCTION_INDEX, quantity);
+        handleSubProcessError(error, updatedTransactionDetail, FUNCTION_INDEX, quantity);
     }
 }
 
@@ -165,7 +165,7 @@ async function cancelOpenOrder(transactionDetail, quantity, attempts) {
         } else {
             logger.info(`${transactionDetail.processId} - Order failed to cancel (based on status) at function ${FUNCTION_INDEX + 1}: No open orders`);
             // Check if the order was already executed
-            return checkAndProcessOrder(transactionDetail);
+            return checkAndProcessOrder(newTransactionDetail);
         }
     } catch(error) {
         logger.info(`${transactionDetail.processId} - Order failed to cancel (based on error) at function ${FUNCTION_INDEX + 1}: No open orders`);

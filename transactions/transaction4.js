@@ -13,20 +13,21 @@ async function transaction4(
     isFirstAttempt = true
 ) {
     if (CONDITION_SETS[transactionDetail.set].trades.length === 3) {
-        // Only 3 coin pairs are used instaed of original 4
+        // When only three coin pairs are used instaed of the original four
         return endSubProcess(transactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.COMPLETED, "Sub-process completed; Terminating branch");
     }
 
-    let orderInfo;
+    let updatedTransactionDetail = transactionDetail,
+        orderInfo;
 
     if (isFirstAttempt) {
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1} first attempt`);
         orderInfo = getOrderInfo(transactionDetail, FUNCTION_INDEX);
     } else {
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1} consecutive attempt`);
-        const bidAskPrices = await fetchBidAskPrices(),
-            updatedTransactionDetail = updateAllPrices(transactionDetail, { bidAskPrices });
+        const bidAskPrices = await fetchBidAskPrices();
 
+        updatedTransactionDetail = updateAllPrices(transactionDetail, { bidAskPrices });
         logger.info(`${transactionDetail.processId} - Function ${FUNCTION_INDEX + 1}: Price updated transaction detail - ${JSON.stringify(updatedTransactionDetail)}`);
         orderInfo = getOrderInfo(updatedTransactionDetail, FUNCTION_INDEX);
     }
@@ -47,7 +48,7 @@ async function transaction4(
                 setPrice: executionResponse.price,
                 fills: executionResponse.fills
             },
-            newTransactionDetail = updateTransactionDetail(transactionDetail, FUNCTION_INDEX, updatedValues);
+            newTransactionDetail = updateTransactionDetail(updatedTransactionDetail, FUNCTION_INDEX, updatedValues);
 
         logger.info(`${transactionDetail.processId} - Execution response from function ${FUNCTION_INDEX + 1}: ${JSON.stringify(executionResponse, null, 2)})}`);
 
@@ -59,7 +60,7 @@ async function transaction4(
             return checkOrderStatusInLoop(newTransactionDetail, quantity, performance.now()); // Start timer
         }
     } catch(error) {
-        handleSubProcessError(error, transactionDetail, FUNCTION_INDEX, quantity);
+        handleSubProcessError(error, updatedTransactionDetail, FUNCTION_INDEX, quantity);
     }
 }
 
@@ -81,7 +82,6 @@ async function checkAndProcessOrder(transactionDetail, error) {
 
     if (statusResponse.status === ORDER_STATUS.FILLED) {
         logger.info(`${transactionDetail.processId} - Order already filled at function ${FUNCTION_INDEX + 1}`);
-
         return endSubProcess(newTransactionDetail, FUNCTION_INDEX, TRANSACTION_STATUS.COMPLETED, "Sub-process completed; Terminating branch");
     } else {
         // Something unusual
@@ -133,7 +133,7 @@ async function cancelOpenOrder(transactionDetail, quantity) {
         } else {
             logger.info(`${transactionDetail.processId} - Order failed to cancel (based on status) at function ${FUNCTION_INDEX + 1}: No open orders`);
             // Check if the order was already executed
-            return checkAndProcessOrder(transactionDetail);
+            return checkAndProcessOrder(newTransactionDetail);
         }
     } catch(error) {
         logger.info(`${transactionDetail.processId} - Order failed to cancel (based on error) at function ${FUNCTION_INDEX + 1}: No open orders`);

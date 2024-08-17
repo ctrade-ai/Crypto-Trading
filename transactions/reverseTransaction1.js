@@ -68,7 +68,6 @@ async function checkAndProcessOrder(transactionDetail, status, error) {
 
     if (statusResponse.status === ORDER_STATUS.FILLED) {
         logger.info(`${transactionDetail.processId} - Order already filled at function ${FUNCTION_INDEX + 1}`);
-
         return endSubProcess(newTransactionDetail, FUNCTION_INDEX, status, "Sub-process completed; Terminating branch");
     } else {
         // Something unusual
@@ -120,7 +119,7 @@ async function cancelOpenOrder(transactionDetail, quantity, status) {
         } else {
             logger.info(`${transactionDetail.processId} - Order failed to cancel (based on status) at function ${FUNCTION_INDEX + 1}: No open orders`);
             // Check if the order was already executed
-            return checkAndProcessOrder(transactionDetail, status);
+            return checkAndProcessOrder(newTransactionDetail, status);
         }
     } catch(error) {
         logger.info(`${transactionDetail.processId} - Order failed to cancel (based on error) at function ${FUNCTION_INDEX + 1}: No open orders`);
