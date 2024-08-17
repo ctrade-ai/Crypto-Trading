@@ -1,9 +1,10 @@
 const axios = require("axios");
 const { generateSignature } = require("../utils/helpers");
 const logger = require("../utils/logger");
+const config = require("../config/config");
 
 async function makeApiCall(endpoint, params = {}, method = "GET", authRequired = false ) {
-    let url = `${process.env.BASE_URL}${endpoint}`, response;
+    let url = `${config.BASE_URL}${endpoint}`, response;
 
     try {
         if (authRequired) {
@@ -17,10 +18,10 @@ async function makeApiCall(endpoint, params = {}, method = "GET", authRequired =
 
             // Generate query string before adding signature
             let queryString = new URLSearchParams(params).toString();
-            const signature = generateSignature(queryString, process.env.API_SECRET);
+            const signature = generateSignature(queryString, config.API_SECRET);
 
             params.signature = signature;
-            headers["X-MBX-APIKEY"] = process.env.API_KEY;
+            headers["X-MBX-APIKEY"] = config.API_KEY;
 
             // Recreate query string with signature
             queryString = new URLSearchParams(params).toString();

@@ -3,6 +3,7 @@ const { getCapital, getQtyPrecision } = require("../utils/helpers");
 const logger = require("../utils/logger");
 const makeApiCall = require("./api");
 const { generalRequestLimiter, rawRequestLimiter, dailyOrderLimiter, orderPlacementLimiter } = require("../config/rateLimitConfig");
+const config = require("../config/config");
 
 async function fetchMarketPrices() {
     const symbolsParam = JSON.stringify(Object.keys(SYMBOLS));
@@ -14,7 +15,7 @@ async function fetchMarketPrices() {
         logger.info(`ABRACADABRA[PRICES] - New order placed API hit (POST)`);
         const prices = await generalRequestLimiter.schedule({ weight: 2 }, () =>
             rawRequestLimiter.schedule({ weight: 2 }, () =>
-                makeApiCall(process.env.MARKET_PRICES_PATH, { symbols: symbolsParam })
+                makeApiCall(config.MARKET_PRICES_PATH, { symbols: symbolsParam })
             )
         );
 
@@ -36,7 +37,7 @@ async function fetchBidAskPrices() {
         logger.info(`ABRACADABRA[PRICES] - New order placed API hit (POST)`);
         const prices = await generalRequestLimiter.schedule({ weight: 2 }, () =>
             rawRequestLimiter.schedule({ weight: 2 }, () =>
-                makeApiCall(process.env.BID_ASK_PRICES_PATH, { symbols: symbolsParam })
+                makeApiCall(config.BID_ASK_PRICES_PATH, { symbols: symbolsParam })
             )
         );
 
@@ -56,7 +57,7 @@ async function checkOrderStatus(params) {
         logger.info(`ABRACADABRA[STATUS] - New order placed API hit (POST)`);
         const response = await generalRequestLimiter.schedule({ weight: 2 }, () =>
             rawRequestLimiter.schedule({ weight: 2 }, () =>
-                makeApiCall(process.env.ORDER_PATH, params, "GET", true)
+                makeApiCall(config.ORDER_PATH, params, "GET", true)
             )
         );
 
@@ -75,7 +76,7 @@ async function cancelOrder(params) {
         logger.info(`ABRACADABRA[CANCEL] - New order placed API hit (POST)`);
         const response = await generalRequestLimiter.schedule({ weight: 1 }, () =>
             rawRequestLimiter.schedule({ weight: 1 }, () =>
-                makeApiCall(process.env.ORDER_PATH, params, "DELETE", true)
+                makeApiCall(config.ORDER_PATH, params, "DELETE", true)
             )
         );
 
@@ -144,7 +145,7 @@ async function executeOrder({
             rawRequestLimiter.schedule({ weight: 1 }, () =>
                 dailyOrderLimiter.schedule(() =>
                     orderPlacementLimiter.schedule(() =>
-                        makeApiCall(process.env.ORDER_PATH, params, "POST", true)
+                        makeApiCall(config.ORDER_PATH, params, "POST", true)
                     )
                 )
             )
