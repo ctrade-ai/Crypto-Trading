@@ -54,8 +54,8 @@ async function transaction2(
     if (
         (isMarketPrice && side === SIDE.BUY && formula1) ||     // Buying at Market Price
         (isMarketPrice && side === SIDE.SELL && formula2) ||    // Selling at Market Price
-        (!isMarketPrice && side === SIDE.BUY && formula3) ||    // Buying at Bid/Ask Price --> Ask
-        (!isMarketPrice && side === SIDE.SELL && formula4)      // Selling at Bid/Ask Price --> Bid
+        (!isMarketPrice && side === SIDE.BUY && formula3) ||    // Buying at Bid/Ask Price
+        (!isMarketPrice && side === SIDE.SELL && formula4)      // Selling at Bid/Ask Price
     ) {
         /* Code will only run for this condition block */
 
